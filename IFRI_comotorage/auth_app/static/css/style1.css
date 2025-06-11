@@ -1,0 +1,185 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+a{
+    text-decoration: none;
+}
+body{
+    position: relative;
+}
+.nav{
+    position: relative;
+}
+.bar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.bar img{
+    width: 62px;
+    border-radius: 10px;
+    margin: 0 8px 0 6px;
+}
+.bloc-logo .col-wh{
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translate(0%,-50%);
+}
+.bloc-logo{
+    display: flex;
+    height: fit-content;
+    align-items: center;
+    height: 100%;
+    width: fit-content;
+    background-color: white;
+    padding-right: 0;
+    position: relative;
+    border-radius: 0 2.5em 2.5em 0;
+}
+.mobile-bar{
+    display: flex;
+    align-items: center;
+}
+.mobile-bar span{
+    padding: 10px;
+    margin-left: 8px;
+}
+.chrono{
+    display: flex;
+    flex-direction: row;
+    gap:0.6em;
+    padding: 10px 16px 10px 16px;
+}
+.chrono p{
+    display: inline;
+}
+.logo{
+    display: flex;
+    justify-content: center;
+}
+.logo img{
+    width: 300px;
+    margin-inline: auto;
+}
+.form{
+    width: 80%;
+    max-width: 80%;
+    margin-inline: auto;
+    border: solid 8px #4DD5DC;
+    border-radius: 2em;
+    padding: 40px;
+}
+
+.form-control{
+    box-sizing: border-box;
+    border: solid 3px #4DD5DC;
+    border-radius: 8px;
+}
+.radio-wrapper{
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
+    box-sizing: border-box;
+    border: solid 3px #4DD5DC;
+    border-radius: 8px;
+    align-items: center;
+    padding: 6px;
+}
+.radio-inline{
+    margin-right: 8px;
+}
+.radio-divider{
+    width: 3px;
+    height: 20px;
+    border-radius: 8px;
+    background-color: rgb(189, 189, 189);
+}
+.radio-choice{
+    display: flex inline;
+}
+.form button{
+    display: block;
+    margin-inline: auto;
+}
+.form button:hover{
+    color: white;
+}
+.menu-block{
+    display: none;
+}
+.menu-container{
+    height: 80vh;
+    width: 450px;
+    max-width: 450px;
+    display: flex;
+    justify-content: left;
+    background-color: whitesmoke;
+}
+.menu-list{
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+}
+.menu-list li{
+    display: inline-block;
+    padding: 10px;
+    margin-top: 6px;
+}
+
+
+.img-bloc svg{
+   
+}
+.img-bloc{
+    height: 250px;
+    width: 250px;
+    border-radius: 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-inline: auto;
+    margin-block: 4em;
+    box-sizing: border-box;
+    position: relative;
+}
+.profile-img{
+    height: 220px;
+    width: 220px;
+    border-radius: 50%;
+    position: relative;
+}
+.photo {
+    position: absolute;
+    bottom: 4%;
+    right: 4%;
+    background-color: white;
+    border-radius: 50%;
+    padding: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.info-trajet{
+    display: flex;
+}
+.trajet{
+    height: 100px;
+    width: 100px;
+}
+fieldset {
+  all: revert;
+  border: 1px solid #ccc;
+  padding: 1em;
+}
+.edit{
+    position: absolute;
+    top: 10%;
+    right: 2%;
+}
+@media screen and (min-width:710px) {
+            
+    }
+@media screen and (max-width: 768px) {
+       /* .container-md{width: 100%;}*/
+    }

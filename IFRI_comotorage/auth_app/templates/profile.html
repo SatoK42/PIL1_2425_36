@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style1.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style2.css' %}">
+    <title>Document</title>
+</head>
+<body class="container-md">
+    <nav class="bg-g">
+        <div class="bar">
+            <div class="bloc-logo">
+                <img src="{% static 'img/logo.png' %}" alt="logo">
+                <span><h2 class="col-g">Ride</h2></span>
+                <span><h2 class="col-wh">4UAC</h2></span>
+
+            </div>
+            <div class="bg-b chrono">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"/><rect width="2" height="7" x="11" y="6" fill="currentColor" rx="1"><animateTransform attributeName="transform" dur="9s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></rect><rect width="2" height="9" x="11" y="11" fill="currentColor" rx="1"><animateTransform attributeName="transform" dur="0.75s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></rect></svg>
+                <span><p>XX : XX : XX</p></span>
+            </div>
+            <div class="mobile-bar">
+                <span class="btn bg-g "><a href="#" class="col-wh">Log out <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m21.207 11.793l-5.914 5.914l-1.414-1.414l3.5-3.5H7.793v-2h9.586l-3.5-3.5l1.414-1.414zm-11.414-7.5h-5v15h5v2h-7v-19h7z"/></svg></a></span> 
+                <span><a href="" class="menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="white" d="M2 4h20v2H2zm0 7h20v2H2zm1 7H2v2h20v-2z"/></svg></a></span>
+            </div>
+        </div>
+        <div class="menu-block">
+            <div class="menu-container">
+                <ul class="menu-list">
+                    <li><a href="#">A propos</a></li>
+                    <li><a href="#">Contacts</a></li>
+                    <li><a href="#">Aide</a></li>
+                </ul>
+            </div>
+        </div>
+        <svg class="edit" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M9.533 11.15A1.82 1.82 0 0 0 9 12.438V15h2.578c.483 0 .947-.192 1.289-.534l7.6-7.604a1.82 1.82 0 0 0 0-2.577l-.751-.751a1.82 1.82 0 0 0-2.578 0z"/><path d="M21 12c0 4.243 0 6.364-1.318 7.682S16.242 21 12 21s-6.364 0-7.682-1.318S3 16.242 3 12s0-6.364 1.318-7.682S7.758 3 12 3"/></g></svg>
+    </nav>
+    <div>
+        <div class="img-bloc bg-whk">
+            <div class="profile-img bg-wh">
+                <svg class="photo" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="13" r="3"/><path d="M9.778 21h4.444c3.121 0 4.682 0 5.803-.735a4.4 4.4 0 0 0 1.226-1.204c.749-1.1.749-2.633.749-5.697s0-4.597-.749-5.697a4.4 4.4 0 0 0-1.226-1.204c-.72-.473-1.622-.642-3.003-.702c-.659 0-1.226-.49-1.355-1.125A2.064 2.064 0 0 0 13.634 3h-3.268c-.988 0-1.839.685-2.033 1.636c-.129.635-.696 1.125-1.355 1.125c-1.38.06-2.282.23-3.003.702A4.4 4.4 0 0 0 2.75 7.667C2 8.767 2 10.299 2 13.364s0 4.596.749 5.697c.324.476.74.885 1.226 1.204C5.096 21 6.657 21 9.778 21Z"/><path stroke-linecap="round" d="M19 10h-1"/></g></svg>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+       <div class="container row">
+            <table class="table">
+                <tbody>
+                    <tr>
+                    <th scope="row"><h5>Statut</h5></th>
+                    <td><span>Passager</span></td>
+                    </tr>
+                    <tr>
+                    <th scope="row"><h5>Statut</h5></th>
+                    <td><span>Passager</span></td>
+                    </tr>
+                    <tr>
+                    <th scope="row"><h5>Statut</h5></th>
+                    <td><span>Passager</span></td>
+                    </tr>
+                    <tr>
+                    <th scope="row"><h5>Statut</h5></th>
+                    <td><span>Passager</span></td>
+                    </tr>
+                    <tr>
+                    <th scope="row"><h5>Statut</h5></th>
+                    <td><span>Passager</span></td>
+                    </tr>
+                </tbody>
+            </table>
+       </div>
+       <div class="container">
+        <fieldset>
+            <legend class="text-center">Trajet Quotidient</legend>
+            <div class="info-trajet">
+                <p>Heure de départ : 07h-00 <br>Heure d'arrivée : 07h-40 </p>
+                <span class="trajet"></span>
+            </div>
+        </fieldset>
+       </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+</body>
+</html>

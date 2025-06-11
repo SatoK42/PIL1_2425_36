@@ -24,3 +24,6 @@ def login(request):
         else:
             return render(request, 'login.html', {'error': 'Nom d\'utilisateur ou mot de passe incorrect'})
     return render(request, 'login.html')
+
+def profile(request):
+    return render(request, 'profile.html')
