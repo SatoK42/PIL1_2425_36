@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier mon trajet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <style>
+        #mapid { height: 450px; width: 100%; border-radius: 10px; margin: 0 auto; }
+        .form-block { max-width: 400px; margin: 20px auto; text-align: center; }
+        .coords { font-size: 0.9em; color: #555; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">Modifier mon trajet quotidien</h2>
+    <div class="form-block">
+        <label for="adresse">Point de départ :</label>
+        <input type="text" id="adresse" placeholder="Saisir le point de départ" style="width:65%;margin-bottom:10px;display:inline-block;">
+        <button type="button" id="btn-adresse" style="width:30%;margin-left:2%;">Trouver</button>
+        <span id="loading-adresse" style="display:none;margin-left:10px;">Recherche…</span>
+    </div>
+    <div id="mapid"></div>
+    <div class="form-block coords">
+        <b id="lieu_depart">Départ</b> : <span id="affiche_depart">-</span><br>
+        <b>IFRI</b> : <span id="affiche_arrivee">6.416676, 2.340447</span>
+    </div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/@mapbox/polyline@1.1.1/src/polyline.js"></script>
+    <script>
+    var map, departMarker, arriveeMarker, routeControl;
+    var IFRI_COORDS = [6.416676, 2.340447];
+    window.onload = function() {
+        map = L.map('mapid').setView(IFRI_COORDS, 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Marqueur d'arrivée (IFRI)
+        var redIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34]
+        });
+        arriveeMarker = L.marker(IFRI_COORDS, {icon: redIcon}).addTo(map).bindPopup("IFRI").openPopup();
+        document.getElementById('affiche_arrivee').textContent = IFRI_COORDS[0] + ', ' + IFRI_COORDS[1];
+
+        // Fonction pour tracer la route
+        function drawRoute(lat1, lng1, lat2, lng2) {
+            if (routeControl) {
+                map.removeLayer(routeControl);
+                routeControl = null;
+            }
+            fetch('https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf6248aecf3cf8f85e453f9f2dc9784d65fd45', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    coordinates: [
+                        [lng1, lat1],
+                        [lng2, lat2]
+                    ]
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.routes || !data.routes[0]) {
+                    alert("Erreur ORS : Pas de route trouvée");
+                    return;
+                }
+                var coords = polyline.decode(data.routes[0].geometry);
+                routeControl = L.polyline(coords, {color: 'blue'}).addTo(map);
+                map.fitBounds(routeControl.getBounds());
+            })
+            .catch(err => {
+                alert("Erreur lors du calcul de l'itinéraire : " + err);
+            });
+        }
+
+        // Recherche d'adresse (limitée au Bénin)
+        document.getElementById('btn-adresse').addEventListener('click', function() {
+            var adresse = document.getElementById('adresse').value;
+            if (adresse.length < 3) return;
+            var btn = document.getElementById('btn-adresse');
+            var loading = document.getElementById('loading-adresse');
+            btn.disabled = true;
+            loading.style.display = 'inline';
+            fetch('https://nominatim.openstreetmap.org/search?format=json&countrycodes=ben&viewbox=1.8,7.5,2.7,6.2&bounded=1&q=' + encodeURIComponent(adresse))
+                .then(response => response.json())
+                .then(data => {
+                    btn.disabled = false;
+                    loading.style.display = 'none';
+                    if (data && data.length > 0) {
+                        var lat = parseFloat(data[0].lat);
+                        var lon = parseFloat(data[0].lon);
+                        setDepartMarker(lat, lon, data[0].display_name);
+                    } else {
+                        alert('Adresse non trouvée');
+                    }
+                })
+                .catch(function() {
+                    btn.disabled = false;
+                    loading.style.display = 'none';
+                    alert('Erreur lors de la recherche.');
+                });
+        });
+
+        // Permettre le choix du point de départ au clic sur la carte
+        map.on('click', function(e) {
+            var lat = e.latlng.lat;
+            var lon = e.latlng.lng;
+            // On effectue un reverse geocoding pour trouver le nom du lieu
+            fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon + '&zoom=16&addressdetails=1')
+                .then(response => response.json())
+                .then(data => {
+                    var lieu = data.display_name || 'Départ';
+                    setDepartMarker(lat, lon, lieu);
+                })
+                .catch(function() {
+                    setDepartMarker(lat, lon, 'Départ');
+                });
+        });
+
+        function setDepartMarker(lat, lon, lieu) {
+            if (departMarker) {
+                departMarker.setLatLng([lat, lon]);
+            } else {
+                departMarker = L.marker([lat, lon], {draggable: true}).addTo(map).bindPopup("Départ").openPopup();
+                departMarker.on('dragend', function(ev) {
+                    var pos = ev.target.getLatLng();
+                    // Reverse geocoding pour le nom du lieu
+                    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + pos.lat + '&lon=' + pos.lng + '&zoom=16&addressdetails=1')
+                        .then(response => response.json())
+                        .then(data => {
+                            var lieu = data.display_name || 'Départ';
+                            updateAffichageCoords(pos.lat, pos.lng, lieu);
+                        })
+                        .catch(function() {
+                            updateAffichageCoords(pos.lat, pos.lng, 'Départ');
+                        });
+                    drawRoute(pos.lat, pos.lng, IFRI_COORDS[0], IFRI_COORDS[1]);
+                });
+            }
+            updateAffichageCoords(lat, lon, lieu);
+            drawRoute(lat, lon, IFRI_COORDS[0], IFRI_COORDS[1]);
+            map.setView([lat, lon], 14);
+        }
+
+        function updateAffichageCoords(lat, lon, lieu) {
+            document.getElementById('affiche_depart').textContent = lat && lon ? lat.toFixed(6) + ', ' + lon.toFixed(6) : '-';
+            document.getElementById('lieu_depart').textContent = lieu ? lieu : 'Départ';
+        }
+    }
+    </script>
+</body>
+</html> 
