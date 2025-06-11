@@ -27,3 +27,6 @@ def login(request):
 
 def profile(request):
     return render(request, 'profile.html')
+
+def acceuil(request):
+    return render(request, 'acceuil.html')
