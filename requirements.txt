@@ -1,1 +1,10 @@
- 
+Django>=5.2
+mysqlclient
+python-dotenv
+
+# Si mysqlclient ne fonctionne pas sur votre machine (surtout sous Windows),
+# vous pouvez essayer d'installer PyMySQL comme alternative :
+# pip install PyMySQL
+# Puis, dans settings.py, ajoutez AVANT toute importation de Django :
+# import pymysql
+# pymysql.install_as_MySQLdb() 
