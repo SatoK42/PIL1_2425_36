@@ -2,14 +2,13 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Modifier mon trajet quotidien</title>
+    <title>Trajet Aller/Retour IFRI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
     <style>
         #mapid { height: 45vh; min-height: 300px; width: 100%; border-radius: 10px; margin: 0 auto; }
-        .form-block { max-width: 500px; margin: 20px auto; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .coords { font-size: 0.9em; color: #555; margin-top: 10px; }
+        .form-block { max-width: 600px; margin: 20px auto; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .coords { font-size: 0.95em; color: #555; margin-top: 10px; }
         #loading-adresse { display: none; margin-left: 10px; }
         .search-icon-btn {
             background: none;
@@ -25,7 +24,7 @@
             color: #333;
         }
         .reset-btn {
-            background: #e74c3c;
+            background: #100f0f;
             color: #fff;
             border: none;
             border-radius: 5px;
@@ -33,6 +32,24 @@
             cursor: pointer;
             font-size: 1em;
             margin-left: 8px;
+        }
+        .sens-btns {
+            display: flex;
+            gap: 8px;
+        }
+        .sens-btn {
+            background: #f1f1f1;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            padding: 4px 14px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sens-btn.active {
+            background: #3498db;
+            color: #fff;
+            border-color: #3498db;
         }
         select {
             margin-left: 10px;
@@ -49,204 +66,209 @@
             #mapid { height: 250px; }
             .form-block { flex-direction: column; gap: 4px; }
             select { margin-left: 0; }
+            .sens-btns { flex-direction: column; gap: 4px; }
         }
     </style>
 </head>
 <body>
     <h2 style="text-align:center;">Modifier mon trajet quotidien</h2>
     <div class="form-block">
-        <label for="adresse">Point de départ :</label>
-        <input type="text" id="adresse" placeholder="Saisir le point de départ" style="width:60%;margin-bottom:10px;display:inline-block;">
+        <span class="sens-btns">
+            <button type="button" id="btn-ifri-depart" class="sens-btn active">IFRI → Autre lieu</button>
+            <button type="button" id="btn-ifri-arrivee" class="sens-btn">Autre lieu → IFRI</button>
+        </span>
+        <input type="text" id="adresse" placeholder="Saisir l'autre point" style="width:50%;margin-bottom:10px;display:inline-block;">
         <button type="button" id="btn-adresse" class="search-icon-btn" title="Rechercher">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8" stroke-width="2"/><path stroke-width="2" d="M21 21l-3.5-3.5"/></svg>
         </button>
-        <select id="mode-transport" title="Mode de transport">
-            <option value="driving-car">Voiture</option>
-            <option value="driving-hgv">Moto</option>
-        </select>
         <button type="button" id="btn-reset" class="reset-btn">Réinitialiser</button>
         <span id="loading-adresse">Recherche…</span>
     </div>
     <div id="mapid"></div>
-    <div class="form-block coords">
-        <b id="lieu_depart">Départ</b> : <span id="affiche_depart">-</span><br>
-        <b>IFRI</b> : <span id="affiche_arrivee">6.416676, 2.340447</span>
+    <div class="form-block coords" id="coords-block">
+        <b id="label-depart">Départ</b> : <span id="affiche_depart">-</span><br>
+        <b id="label-arrivee">Arrivée</b> : <span id="affiche_arrivee">-</span>
     </div>
     <div class="trajet-info" id="trajet-info"></div>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/@mapbox/polyline@1.1.1/src/polyline.js"></script>
     <script>
     // --- CONFIGURATION ---
+    const IFRI_COORDS = [6.416676, 2.340447];
     const CONFIG = {
-        ORS_API_KEY: '5b3ce3597851110001cf6248aecf3cf8f85e453f9f2dc9784d65fd45', // À remplacer par une variable d'environnement côté backend !
         NOMINATIM_URL: 'https://nominatim.openstreetmap.org/search',
         NOMINATIM_REVERSE_URL: 'https://nominatim.openstreetmap.org/reverse',
         VIEWBOX: '1.8,7.5,2.7,6.2', // Sud Bénin
-        IFRI_COORDS: [6.416676, 2.340447]
+        ORS_API_KEY: '5b3ce3597851110001cf6248aecf3cf8f85e453f9f2dc9784d65fd45',
+        ORS_PROFILE: 'driving-car'
     };
     let map, departMarker, arriveeMarker, routeControl;
-    let currentProfile = 'driving-car';
-    let lastRouteRequest = null;
+    let sens = 'ifri-depart';
+    let otherCoords = null;
+    let otherLieu = '';
     window.onload = function() {
-        map = L.map('mapid').setView(CONFIG.IFRI_COORDS, 13);
+        map = L.map('mapid').setView(IFRI_COORDS, 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
-        // Marqueur d'arrivée (IFRI)
-        var redIcon = L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34]
+        // Initialisation des marqueurs
+        setSens('ifri-depart');
+        document.getElementById('btn-ifri-depart').addEventListener('click', function() {
+            setSens('ifri-depart');
+            setActiveSensBtn('btn-ifri-depart');
         });
-        arriveeMarker = L.marker(CONFIG.IFRI_COORDS, {icon: redIcon}).addTo(map).bindPopup("IFRI").openPopup();
-        document.getElementById('affiche_arrivee').textContent = CONFIG.IFRI_COORDS[0] + ', ' + CONFIG.IFRI_COORDS[1];
-
-        // Mode de transport
-        const select = document.getElementById('mode-transport');
-        select.addEventListener('change', function() {
-            currentProfile = select.value;
-            if (departMarker) {
-                const pos = departMarker.getLatLng();
-                drawRoute(pos.lat, pos.lng, CONFIG.IFRI_COORDS[0], CONFIG.IFRI_COORDS[1]);
-            }
+        document.getElementById('btn-ifri-arrivee').addEventListener('click', function() {
+            setSens('ifri-arrivee');
+            setActiveSensBtn('btn-ifri-arrivee');
         });
-
-        // Spinner
-        function showSpinner(show) {
-            document.getElementById('loading-adresse').style.display = show ? 'inline' : 'none';
-        }
-
-        // Nettoyage de la recherche
-        document.getElementById('btn-reset').addEventListener('click', function() {
-            document.getElementById('adresse').value = '';
-            if (departMarker) {
-                map.removeLayer(departMarker);
-                departMarker = null;
-            }
-            if (routeControl) {
-                map.removeLayer(routeControl);
-                routeControl = null;
-            }
-            document.getElementById('affiche_depart').textContent = '-';
-            document.getElementById('lieu_depart').textContent = 'Départ';
-            document.getElementById('trajet-info').textContent = '';
-            map.setView(CONFIG.IFRI_COORDS, 13);
-        });
-
-        // Recherche d'adresse (limitée sud Bénin)
-        document.getElementById('btn-adresse').addEventListener('click', function() {
-            const adresse = document.getElementById('adresse').value;
-            if (adresse.length < 3) return;
-            showSpinner(true);
-            fetch(`${CONFIG.NOMINATIM_URL}?format=json&countrycodes=ben&viewbox=${CONFIG.VIEWBOX}&bounded=1&q=${encodeURIComponent(adresse)}`)
-                .then(response => response.json())
-                .then(data => {
-                    showSpinner(false);
-                    if (data && data.length > 0) {
-                        const lat = parseFloat(data[0].lat);
-                        const lon = parseFloat(data[0].lon);
-                        setDepartMarker(lat, lon, data[0].display_name);
-                    } else {
-                        alert('Adresse non trouvée');
-                    }
-                })
-                .catch(function() {
-                    showSpinner(false);
-                    alert('Erreur lors de la recherche.');
-                });
-        });
-
-        // Permettre le choix du point de départ au clic sur la carte
+        document.getElementById('btn-adresse').addEventListener('click', searchOtherPoint);
+        document.getElementById('btn-reset').addEventListener('click', resetAll);
         map.on('click', function(e) {
             const lat = e.latlng.lat;
             const lon = e.latlng.lng;
             fetch(`${CONFIG.NOMINATIM_REVERSE_URL}?format=json&lat=${lat}&lon=${lon}&zoom=16&addressdetails=1`)
                 .then(response => response.json())
                 .then(data => {
-                    const lieu = data.display_name || 'Départ';
-                    setDepartMarker(lat, lon, lieu);
+                    otherLieu = data.display_name || 'Autre lieu';
+                    setOtherPoint(lat, lon, otherLieu);
                 })
                 .catch(function() {
-                    setDepartMarker(lat, lon, 'Départ');
+                    setOtherPoint(lat, lon, 'Autre lieu');
                 });
         });
-
-        function setDepartMarker(lat, lon, lieu) {
-            if (departMarker) {
-                departMarker.setLatLng([lat, lon]);
-            } else {
-                departMarker = L.marker([lat, lon], {draggable: true}).addTo(map).bindPopup("Départ").openPopup();
-                departMarker.on('dragend', function(ev) {
-                    const pos = ev.target.getLatLng();
-                    fetch(`${CONFIG.NOMINATIM_REVERSE_URL}?format=json&lat=${pos.lat}&lon=${pos.lng}&zoom=16&addressdetails=1`)
-                        .then(response => response.json())
-                        .then(data => {
-                            const lieu = data.display_name || 'Départ';
-                            updateAffichageCoords(pos.lat, pos.lng, lieu);
-                        })
-                        .catch(function() {
-                            updateAffichageCoords(pos.lat, pos.lng, 'Départ');
-                        });
-                    drawRoute(pos.lat, pos.lng, CONFIG.IFRI_COORDS[0], CONFIG.IFRI_COORDS[1]);
-                });
-            }
-            updateAffichageCoords(lat, lon, lieu);
-            drawRoute(lat, lon, CONFIG.IFRI_COORDS[0], CONFIG.IFRI_COORDS[1]);
-            map.setView([lat, lon], 14);
+    };
+    function setActiveSensBtn(activeId) {
+        document.getElementById('btn-ifri-depart').classList.remove('active');
+        document.getElementById('btn-ifri-arrivee').classList.remove('active');
+        document.getElementById(activeId).classList.add('active');
+    }
+    function setSens(newSens) {
+        sens = newSens;
+        // Nettoyage
+        if (departMarker) { map.removeLayer(departMarker); departMarker = null; }
+        if (arriveeMarker) { map.removeLayer(arriveeMarker); arriveeMarker = null; }
+        if (routeControl) { map.removeLayer(routeControl); routeControl = null; }
+        otherCoords = null;
+        otherLieu = '';
+        document.getElementById('adresse').value = '';
+        document.getElementById('trajet-info').textContent = '';
+        document.getElementById('affiche_depart').textContent = '-';
+        document.getElementById('affiche_arrivee').textContent = '-';
+        if (sens === 'ifri-depart') {
+            // IFRI = départ
+            departMarker = L.marker(IFRI_COORDS, {icon: getRedIcon(), draggable: false}).addTo(map).bindPopup("IFRI").openPopup();
+            document.getElementById('label-depart').textContent = 'Départ';
+            document.getElementById('label-arrivee').textContent = 'Arrivée';
+            document.getElementById('affiche_depart').textContent = 'IFRI';
+        } else {
+            // IFRI = arrivée
+            arriveeMarker = L.marker(IFRI_COORDS, {icon: getRedIcon(), draggable: false}).addTo(map).bindPopup("IFRI").openPopup();
+            document.getElementById('label-depart').textContent = 'Départ';
+            document.getElementById('label-arrivee').textContent = 'Arrivée';
+            document.getElementById('affiche_arrivee').textContent = 'IFRI';
         }
-
-        function updateAffichageCoords(lat, lon, lieu) {
-            document.getElementById('affiche_depart').textContent = lat && lon ? lat.toFixed(6) + ', ' + lon.toFixed(6) : '-';
-            document.getElementById('lieu_depart').textContent = lieu ? lieu : 'Départ';
+        map.setView(IFRI_COORDS, 13);
+    }
+    function getRedIcon() {
+        return L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34]
+        });
+    }
+    function setOtherPoint(lat, lon, lieu) {
+        if (sens === 'ifri-depart') {
+            if (arriveeMarker) { map.removeLayer(arriveeMarker); arriveeMarker = null; }
+            arriveeMarker = L.marker([lat, lon], {draggable: true}).addTo(map).bindPopup(lieu).openPopup();
+            arriveeMarker.on('dragend', function(ev) {
+                const pos = ev.target.getLatLng();
+                updateAffichageCoords('arrivee', pos.lat, pos.lng, lieu);
+                drawRoute(IFRI_COORDS[0], IFRI_COORDS[1], pos.lat, pos.lng);
+            });
+            updateAffichageCoords('arrivee', lat, lon, lieu);
+            drawRoute(IFRI_COORDS[0], IFRI_COORDS[1], lat, lon);
+        } else {
+            if (departMarker) { map.removeLayer(departMarker); departMarker = null; }
+            departMarker = L.marker([lat, lon], {draggable: true}).addTo(map).bindPopup(lieu).openPopup();
+            departMarker.on('dragend', function(ev) {
+                const pos = ev.target.getLatLng();
+                updateAffichageCoords('depart', pos.lat, pos.lng, lieu);
+                drawRoute(pos.lat, pos.lng, IFRI_COORDS[0], IFRI_COORDS[1]);
+            });
+            updateAffichageCoords('depart', lat, lon, lieu);
+            drawRoute(lat, lon, IFRI_COORDS[0], IFRI_COORDS[1]);
         }
-
-        // Fonction pour tracer la route
-        function drawRoute(lat1, lng1, lat2, lng2) {
-            let profile = currentProfile;
-            // Si Moto, utiliser le profil bus (driving-hgv)
-            if (profile === 'driving-hgv') {
-                profile = 'driving-hgv';
-            }
-            if (routeControl) {
-                map.removeLayer(routeControl);
-                routeControl = null;
-            }
-            document.getElementById('trajet-info').textContent = '';
-            fetch(`https://api.openrouteservice.org/v2/directions/${profile}?api_key=${CONFIG.ORS_API_KEY}`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    coordinates: [
-                        [lng1, lat1],
-                        [lng2, lat2]
-                    ]
-                })
-            })
+        otherCoords = [lat, lon];
+        otherLieu = lieu;
+    }
+    function updateAffichageCoords(type, lat, lon, lieu) {
+        if (type === 'depart') {
+            document.getElementById('affiche_depart').textContent = `${lieu} (${lat.toFixed(6)}, ${lon.toFixed(6)})`;
+        } else {
+            document.getElementById('affiche_arrivee').textContent = `${lieu} (${lat.toFixed(6)}, ${lon.toFixed(6)})`;
+        }
+    }
+    function searchOtherPoint() {
+        const adresse = document.getElementById('adresse').value;
+        if (adresse.length < 3) return;
+        document.getElementById('loading-adresse').style.display = 'inline';
+        fetch(`${CONFIG.NOMINATIM_URL}?format=json&countrycodes=ben&viewbox=${CONFIG.VIEWBOX}&bounded=1&q=${encodeURIComponent(adresse)}`)
             .then(response => response.json())
             .then(data => {
-                if (!data.routes || !data.routes[0]) {
-                    alert("Erreur ORS : Pas de route trouvée");
-                    return;
-                }
-                var coords = polyline.decode(data.routes[0].geometry);
-                routeControl = L.polyline(coords, {color: 'blue'}).addTo(map);
-                map.fitBounds(routeControl.getBounds());
-                // Affichage temps et distance
-                const summary = data.routes[0].summary;
-                if (summary) {
-                    const distanceKm = (summary.distance / 1000).toFixed(2);
-                    const durationMin = Math.round(summary.duration / 60);
-                    document.getElementById('trajet-info').textContent = `Distance : ${distanceKm} km | Durée : ${durationMin} min`;
+                document.getElementById('loading-adresse').style.display = 'none';
+                if (data && data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lon = parseFloat(data[0].lon);
+                    setOtherPoint(lat, lon, data[0].display_name);
+                } else {
+                    alert('Adresse non trouvée');
                 }
             })
-            .catch(err => {
-                alert("Erreur lors du calcul de l'itinéraire : " + err);
+            .catch(function() {
+                document.getElementById('loading-adresse').style.display = 'none';
+                alert('Erreur lors de la recherche.');
             });
-        }
+    }
+    function drawRoute(lat1, lon1, lat2, lon2) {
+        if (routeControl) { map.removeLayer(routeControl); routeControl = null; }
+        document.getElementById('trajet-info').textContent = '';
+        fetch(`https://api.openrouteservice.org/v2/directions/${CONFIG.ORS_PROFILE}?api_key=${CONFIG.ORS_API_KEY}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                coordinates: [
+                    [lon1, lat1],
+                    [lon2, lat2]
+                ]
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.routes || !data.routes[0]) {
+                alert("Erreur ORS : Pas de route trouvée");
+                return;
+            }
+            var coords = polyline.decode(data.routes[0].geometry);
+            routeControl = L.polyline(coords, {color: 'blue'}).addTo(map);
+            map.fitBounds(routeControl.getBounds());
+            // Affichage temps et distance
+            const summary = data.routes[0].summary;
+            if (summary) {
+                const distanceKm = (summary.distance / 1000).toFixed(2);
+                const durationMin = Math.round(summary.duration / 60);
+                document.getElementById('trajet-info').textContent = `Distance : ${distanceKm} km | Durée : ${durationMin} min`;
+            }
+        })
+        .catch(err => {
+            alert("Erreur lors du calcul de l'itinéraire : " + err);
+        });
+    }
+    function resetAll() {
+        setSens(sens);
     }
     </script>
 </body>
