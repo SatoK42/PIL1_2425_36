@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Environnement virtuel
+venv/
+env/
+ENV/
+.env
+.venv
+env.bak/
+venv.bak/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Fichiers de configuration sensibles
+.env
+.env.local
+.env.*.local
+
+# Fichiers de base de données
+*.sqlite3
+*.db
+
+# Fichiers de cache
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Fichiers de déploiement
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Fichiers de logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Fichiers système
+.DS_Store
+Thumbs.db 
