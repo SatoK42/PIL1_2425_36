@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'auth_app',
     'messagerie.apps.MessagerieConfig',
     'trajet.apps.TrajetConfig',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -73,8 +74,14 @@ TEMPLATES = [
         },
     },
 ]
+ASGI_APPLICATION = 'IFRI_comotorage.asgi.application'
 
-WSGI_APPLICATION = 'IFRI_comotorage.wsgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': { 'hosts': [('127.0.0.1', 6379)], },
+    },
+}
 
 
 # Database

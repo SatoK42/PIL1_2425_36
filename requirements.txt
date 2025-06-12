@@ -1,6 +1,8 @@
 Django>=5.2
 mysqlclient
 python-dotenv
+channels
+django-phonenumber-field[phonenumbers]
 
 # Si mysqlclient ne fonctionne pas sur votre machine (surtout sous Windows),
 # vous pouvez essayer d'installer PyMySQL comme alternative :

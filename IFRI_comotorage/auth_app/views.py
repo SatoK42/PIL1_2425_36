@@ -15,14 +15,14 @@ def register(request):
 
 def login(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, email=email, password=password)
         if user is not None:
             auth_login(request, user)
             return redirect('home')  # Redirige vers la page d'accueil après connexion
         else:
-            return render(request, 'login.html', {'error': 'Nom d\'utilisateur ou mot de passe incorrect'})
+            return render(request, 'login.html', {'error': 'Email ou mot de passe incorrect'})
     return render(request, 'login.html')
 
 def profile(request):
@@ -30,3 +30,6 @@ def profile(request):
 
 def acceuil(request):
     return render(request, 'acceuil.html')
+
+def edit(request):
+    return render(request, 'edit.html')

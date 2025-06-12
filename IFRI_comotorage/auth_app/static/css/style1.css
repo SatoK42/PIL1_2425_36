@@ -38,14 +38,6 @@ body{
     position: relative;
     border-radius: 0 2.5em 2.5em 0;
 }
-.mobile-bar{
-    display: flex;
-    align-items: center;
-}
-.mobile-bar span{
-    padding: 10px;
-    margin-left: 8px;
-}
 .chrono{
     display: flex;
     flex-direction: row;
@@ -76,6 +68,7 @@ body{
     box-sizing: border-box;
     border: solid 3px #4DD5DC;
     border-radius: 8px;
+    
 }
 .radio-wrapper{
     display: flex;
@@ -176,6 +169,9 @@ fieldset {
     position: absolute;
     top: 10%;
     right: 2%;
+}
+.dropdown-item{
+    margin-bottom: 6px;
 }
 @media screen and (min-width:710px) {
             
