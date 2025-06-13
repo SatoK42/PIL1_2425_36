@@ -10,14 +10,6 @@
     <title>Document</title>
 </head>
 <body class="container-md">
-    <!-- Section Horloge -->
-    <div class="text-center banniere-horloge">
-        <div class="horloge">
-            <h4>⏰</h4>
-            <h5 id="countdown">00:00:00</h5>
-            <small>Avant votre prochaine rencontre</small>
-        </div>
-    </div>
     <nav class="bg-g">
         <div class="bar">
             <div class="bloc-logo">
@@ -26,7 +18,7 @@
                 <span><h2 class="col-wh">4UAC</h2></span>
 
             </div>
-           
+
             <div class="mobile-bar">
                 <span class="btn bg-g "><a href="#" class="col-wh">Log out <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m21.207 11.793l-5.914 5.914l-1.414-1.414l3.5-3.5H7.793v-2h9.586l-3.5-3.5l1.414-1.414zm-11.414-7.5h-5v15h5v2h-7v-19h7z"/></svg></a></span> 
                 <span><a href="" class="menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="white" d="M2 4h20v2H2zm0 7h20v2H2zm1 7H2v2h20v-2z"/></svg></a></span>
@@ -43,16 +35,34 @@
         </div>
     </nav>
    
+    <!-- Bannière horloge -->
+<div class="banniere-horloge">
+  <div class="banniere-box">
+    <!-- Icône SVG horloge -->
+    <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="black" viewBox="0 0 16 16">
+      <path d="M8 3.5a.5.5 0 0 1 .5.5v4h3a.5.5 0 0 1 0 1h-3.5A.5.5 0 0 1 7.5 8V4a.5.5 0 0 1 .5-.5z"/>
+      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zM1 8a7 7 0 1 1 14 0A7 7 0 0 1 1 8z"/>
+    </svg>
+    <p class="heure" id="countdown">00:00:00</p>
+    <p class="sous-texte">Avant votre prochaine rencontre</p>
+  </div>
 
-
-<!-- Carte de Trajet -->
-<div class="card mb-4 shadow">
-    <img src="{% static 'img/trajet.webp' %}"  alt="Trajet">
-    <div class="card-body d-flex justify-content-between">
-        <a href="#" class="btn btn-outline-danger btn-sm">Supprimer</a>
-        <a href="#" class="btn btn-outline-primary btn-sm">Modifier</a>
-    </div>
+  <!-- Triangle décoratif -->
+  <svg class="triangle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" preserveAspectRatio="none">
+    <polygon points="0,0 100,0 50,50" style="fill:white;stroke:lightgray;stroke-width:1" />
+  </svg>
 </div>
+
+
+
+    <!-- Carte de Trajet -->
+    <div class="card mb-4 shadow">
+        <img src="{% static 'img/trajet.webp' %}"  alt="Trajet">
+        <div class="card-body d-flex justify-content-between">
+            <a href="#" class="btn btn-outline-danger btn-sm">Supprimer</a>
+            <a href="#" class="btn btn-outline-primary btn-sm">Modifier</a>
+        </div>
+    </div>
 
     <!-- Bouton Partager -->
     <div class="card-body text-center p-4">
