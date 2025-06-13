@@ -1,10 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 
 class Trajet(models.Model):
     ROLE_CHOICES = [('conducteur', 'Conducteur'), ('passager', 'Passager')]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='trajets', on_delete=models.CASCADE)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     lieu_depart = models.CharField(max_length=150)
     lieu_arrivee = models.CharField(max_length=150)

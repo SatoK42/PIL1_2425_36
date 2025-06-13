@@ -246,60 +246,15 @@ fieldset {
 
 
 /*Bannière horloge*/
-.banniere-horloge {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-40%);
-  width: 140px;
-  max-width: 90vw;
-  z-index: 2;
+.ban_clock{
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    width: 20%;
+    max-width: 100px;
 }
-
-.banniere-box {
-  background-color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-  border-radius: 6px 6px 0 0;
-  padding: 15px;
-  text-align: center;
-}
-
-.banniere-box .icon {
-  margin-bottom: 5px;
-  color: black;
-}
-
-.heure {
-  font-weight: bold;
-  font-size: 1.1em;
-  margin: 5px 0;
-  word-break: break-word;
-}
-
-.sous-texte {
-  font-size: 0.9em;
-  color: #333;
-  line-height: 1.3;
-}
-
-.triangle {
-  width: 100%;
-  height: 25px;
-}
-
-/* Responsive */
-@media screen and (max-width: 480px) {
-  .banniere-box {
-    padding: 10px;
-  }
-  .heure {
-    font-size: 1em;
-  }
-  .sous-texte {
-    font-size: 0.8em;
-  }
-}
-/*Fin horloge*/
 
 
 /* Pour le bouton Partager */
