@@ -9,12 +9,14 @@ body{
     position: relative;
 }
 .nav{
-    position: relative;
+    position: fixed;
+    z-index: 100;
 }
 .bar{
     display: flex;
     justify-content: space-between;
     align-items: center;
+    top: 0;
 }
 .bar img{
     width: 62px;
