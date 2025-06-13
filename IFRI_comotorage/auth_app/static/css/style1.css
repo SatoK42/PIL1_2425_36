@@ -236,7 +236,35 @@ fieldset {
     transform: scale(1.2, 1.2);
 }
 
-
+.banniere-horloge {
+    position: relative;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto 1.5rem auto;
+    border-radius: 12px 12px 0 0;
+    padding: 0.7rem 0.5rem 0.5rem 0.5rem;
+}
+.banniere-horloge::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -20px;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 28px solid transparent;
+    border-right: 28px solid transparent;
+    border-top: 20px solid #fff;
+    /* même couleur que la bannière */
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+}
+.horloge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 /* Pour le bouton Partager */
 .btn-partager {
