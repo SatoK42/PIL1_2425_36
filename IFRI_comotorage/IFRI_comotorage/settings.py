@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'messagerie.apps.MessagerieConfig',
     'trajet.apps.TrajetConfig',
     'channels',
+    'profileUser.apps.ProfileuserConfig',
 ]
 
 MIDDLEWARE = [
@@ -161,3 +162,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#Media files settings
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
