@@ -194,7 +194,7 @@ fieldset {
     /*La feuille de style pour le bas de page*/
 .bas_de_page{
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0,1); 
-    position: fixed;
+    position: relative;/* pour ne pas que la map surmonte le bas de page*/
     left: 0;
     right: 0;
     bottom: 0;

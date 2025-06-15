@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/style1.css' %}">
     <link rel="stylesheet" href="{% static 'css/style2.css' %}">
     <link rel="stylesheet" href="{% static 'css/style3.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <title>Document</title>
 </head>
 <body class="container-md">
@@ -99,10 +100,49 @@
                 <p>Heure de départ : 07h-00 <br>Heure d'arrivée : 07h-40 </p>
                 <span class="trajet"></span>
             </div>
+            <!--Affichage map-->
+            <div id="map" style="height: 300px; width: 100%; max-width: 500px; margin: auto; border: 2px solid #ccc; border-radius: 10px;"></div>
+            <!-- Résultat du lieu de départ cliqué -->
+            <div id="lieu-depart-result" class="mt-2 text-center text-primary fw-bold"></div>
         </fieldset>
        </div>
-    
+       <!--SCRIPT carte et itineraire-->
+     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  let departMarker = null;
+  let departLat = null;
+  let departLng = null;
+  let departNom = "";
 
+  const map = L.map("map").setView([6.4184, 2.3432], 13);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  map.on("click", function (e) {
+    const lat = e.latlng.lat;
+    const lng = e.latlng.lng;
+
+    const nom = prompt("Entrez un nom pour ce lieu de départ :");
+
+    if (nom) {
+      if (departMarker) {
+        map.removeLayer(departMarker);
+      }
+
+      departMarker = L.marker([lat, lng]).addTo(map).bindPopup("Départ : " + nom).openPopup();
+
+      departLat = lat;
+      departLng = lng;
+      departNom = nom;
+
+      // Afficher dans le fieldset
+      const resultDiv = document.getElementById("lieu-depart-result");
+      resultDiv.innerHTML = `🧭 Départ sélectionné : <strong>${departNom}</strong>`;
+    }
+  });
+</script>
     <!--Ajout du script pour le bas de page-->
     <div class="bas_de_page">
         <div class="nav_items">
