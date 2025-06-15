@@ -199,7 +199,7 @@ fieldset {
     right: 0;
     bottom: 0;
     z-index: 100;
-    background: #fff;
+    background: #a7a7a7;
 }
 
 .nav_items{
@@ -253,7 +253,7 @@ fieldset {
     transform: translateX(-50%);
     z-index: 200;
     width: 20%;
-    max-width: 100px;
+    max-width: 200px;
 }
 
 

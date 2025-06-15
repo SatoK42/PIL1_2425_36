@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'auth_app',
-    'messagerie.apps.MessagerieConfig',
+    'messaging_app',
     'trajet.apps.TrajetConfig',
     'channels',
 ]
@@ -78,8 +78,7 @@ ASGI_APPLICATION = 'IFRI_comotorage.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': { 'hosts': [('127.0.0.1', 6379)], },
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
 
@@ -156,6 +155,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # si tu as un dossier static/ à la racine du projet
+]
+STATIC_ROOT = BASE_DIR / "staticfiles"  # pour la collecte des fichiers statiques en production
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

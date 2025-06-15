@@ -1,0 +1,24 @@
+{% extends 'auth_app/connected.html' %}
+{% block content %}
+  <h2>Mes conversations</h2>
+  {% if conversations %}
+    <ul class="list-group">
+      {% for c in conversations %}
+        <li class="list-group-item">
+          <a href="{% url 'messaging:conversation_detail' c.id %}">
+            {% if c.is_group %}{{ c.name }}
+            {% else %}
+              {% for u in c.participants.all %}
+                {% if u != request.user %}{{ u.get_full_name|default:u.email }}{% endif %}
+              {% endfor %}
+            {% endif %}
+          </a>
+          <span class="float-end">{{ c.last_msg|date:"d/m H:i" }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Aucune conversation pour l’instant. </p>
+  {% endif %}
+  <a href="{% url 'messaging:new_conversation' %}">Nouveau chat</a>
+{% endblock %}

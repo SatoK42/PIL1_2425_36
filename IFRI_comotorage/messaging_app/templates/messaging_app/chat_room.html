@@ -1,0 +1,46 @@
+{% extends 'auth_app/connected.html' %}
+{% block content %}
+  <h2>{{ chat }}</h2>
+<div id="chat-log">
+  {% for msg in messages %}
+    <p><b>{{ msg.sender.username }}</b> : {{ msg.text }}</p>
+    {% for att in msg.attachments.all %}
+      <p><a href="{{ att.file.url }}" target="_blank">
+        {{ att.file.name|slice:"-20:" }}
+      </a></p>
+    {% endfor %}
+  {% endfor %}
+</div>
+<textarea id="chat-message-input"></textarea>
+<input type="file" id="chat-file-input" multiple />
+<button id="chat-message-submit">Envoyer</button>
+
+
+<script>
+  const chatId = {{ chat.id }};
+  const ws = new WebSocket(
+    'ws://' + window.location.host +
+    '/ws/chat/' + chatId + '/'
+  );
+  ws.onmessage = e => {
+    const data = JSON.parse(e.data);
+    const log = document.getElementById('chat-log');
+    log.innerHTML += `<p><b>${data.sender}</b>: ${data.text}</p>`;
+    // pour fichiers, afficher lien ou aperçu...
+  };
+  ws.onclose = () => console.log('Déconnecté');
+
+  document.querySelector('#chat-message-submit').onclick = () => {
+    const input = document.querySelector('#chat-message-input');
+    const files = document.querySelector('#chat-file-input').files;
+    // Pour les fichiers, les encoder en base64 ou mieux via un POST séparé
+    ws.send(JSON.stringify({
+      'text': input.value,
+      // 'files': [...]
+    }));
+    input.value = '';
+  };
+</script>
+
+{% endblock %}
+{% block title %}Chat Room{% endblock %}

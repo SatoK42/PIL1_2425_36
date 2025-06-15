@@ -31,8 +31,8 @@ def acceuil(request):
     return render(request, 'auth_app/acceuil.html')
 
 def edit(request):
-    return render(request, 'auth_app/edit.html')
+    return render(request, 'edit.html')
 
 def logout(request):
     django_logout(request)
-    return HttpResponseRedirect('/auth/login1/')
+    return HttpResponseRedirect('/auth/login/')

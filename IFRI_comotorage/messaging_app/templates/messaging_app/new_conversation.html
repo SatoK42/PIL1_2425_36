@@ -1,0 +1,111 @@
+{% extends 'auth_app/connected.html' %}
+
+{% block content %}
+  <h2>Nouvelle conversation</h2>
+
+  <form method="post" id="newConvoForm">
+    {% csrf_token %}
+
+    {# Afficher les erreurs globales #}
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    {# is_group #}
+    <div class="form-check mb-3">
+      {{ form.is_group }} {{ form.is_group.label_tag }}
+      {% if form.is_group.errors %}
+        <div class="text-danger">{{ form.is_group.errors }}</div>
+      {% endif %}
+    </div>
+
+    {# name #}
+    <div class="mb-3">
+      {{ form.name.label_tag }}
+      {{ form.name }}
+      {% if form.name.errors %}
+        <div class="text-danger">{{ form.name.errors }}</div>
+      {% endif %}
+    </div>
+
+    {# zone de recherche #}
+    <label for="userSearch">Ajouter des participants :</label>
+    <input type="text" id="userSearch" class="form-control" placeholder="Rechercher un utilisateur…">
+    <ul id="searchResults" class="list-group mt-1"></ul>
+
+    <h5 class="mt-3">Participants sélectionnés :</h5>
+    <ul id="selectedUsers" class="list-group mb-3"></ul>
+
+    <button type="submit" class="btn btn-success">Créer</button>
+  </form>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('userSearch');
+    const searchResults = document.getElementById('searchResults');
+    const selectedUsers = document.getElementById('selectedUsers');
+
+    let selectedUserIds = [];
+
+    searchInput.addEventListener('input', function () {
+        const query = searchInput.value.trim();
+        if (query.length === 0) {
+            searchResults.innerHTML = '';
+            return;
+        }
+
+        fetch(`/chat/search-users/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(users => {
+                searchResults.innerHTML = '';
+                users.forEach(user => {
+                    if (selectedUserIds.includes(user.id)) return; // déjà sélectionné
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item list-group-item-action';
+                    li.textContent = user.name || user.email;
+
+                    li.addEventListener('click', function () {
+                        // Ajouter à la liste sélectionnée
+                        const selectedLi = document.createElement('li');
+                        selectedLi.className = 'list-group-item d-flex justify-content-between align-items-center';
+                        selectedLi.textContent = user.name || user.email;
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.textContent = '×';
+                        removeBtn.className = 'btn btn-sm btn-danger';
+                        removeBtn.addEventListener('click', function () {
+                            selectedUsers.removeChild(selectedLi);
+                            selectedUserIds = selectedUserIds.filter(id => id !== user.id);
+                            updateHiddenInputs();
+                        });
+
+                        selectedLi.appendChild(removeBtn);
+                        selectedUsers.appendChild(selectedLi);
+                        selectedUserIds.push(user.id);
+                        updateHiddenInputs();
+                        searchInput.value = '';
+                        searchResults.innerHTML = '';
+                    });
+
+                    searchResults.appendChild(li);
+                });
+            });
+    });
+
+    function updateHiddenInputs() {
+        // Supprimer tous les anciens inputs
+        document.querySelectorAll('input[name="participants"]').forEach(input => input.remove());
+        // Ajouter les nouveaux
+        selectedUserIds.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'participants';
+            input.value = id;
+            document.getElementById('newConvoForm').appendChild(input);
+        });
+    }
+});
+  </script>
+  
+{% endblock %}
