@@ -5,7 +5,7 @@ from .form import EmailOrPhoneAuthenticationForm, UserModelForm
 from django.contrib.auth import logout as django_logout
 from django.http import HttpResponseRedirect
 from .models import Users
-
+from django.contrib.auth.decorators import login_required
 
 def register(request):
     if request.method == 'POST':
@@ -24,8 +24,19 @@ def login_view(request):
         return redirect('acceuil')
     return render(request, 'auth_app/login.html', {'form': form})
 
+'''
 def profile(request):
     return render(request, 'auth_app/profile.html')
+'''
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from profileUser.models import Profile  # ajuste si ton modèle s’appelle Profil
+
+@login_required
+def profile(request):
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    return render(request, 'auth_app/profile.html', {'profile': profile})
+
 
 def acceuil(request):
     return render(request, 'auth_app/acceuil.html')
