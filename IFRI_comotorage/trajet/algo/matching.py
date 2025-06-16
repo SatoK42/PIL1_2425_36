@@ -63,3 +63,11 @@ def gale_shapley(drivers, passengers):
             else:
                 free.append(m)
     return engaged
+
+# Les préférences (prefs_d, prefs_p) sont construites dynamiquement dans la vue,
+# donc on ne les définit pas ici.
+# matches = gale_shapley(prefs_d, prefs_p)
+# print("🤖 Résultats du matching stable :")
+# for d,p in matches.items():
+#     sc = score_match(next(x for x in drivers if x["nom"]==d), next(x for x in passengers if x["nom"]==p))
+#     print(f"{d} → {p} (score = {sc:.1f})")

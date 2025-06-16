@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Mes propositions de matching</h2>
+  {% if matches %}
+    <ul>
+      {% for match in matches|slice:":5" %}
+        <li>
+          {% if match.photo_profile %}
+            <img src="{{ match.photo_profile }}" alt="Photo de profil" width="50" height="50"/>
+          {% endif %}
+          <strong>{{ match.nom }} {{ match.prenom }}</strong>
+          <button onclick="accepterMatch('{{ match.id }}')">Accepter</button>
+          <button onclick="declinerMatch('{{ match.id }}')">Décliner</button>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Aucune proposition pour l'instant.</p>
+  {% endif %}
+  <script>
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    function accepterMatch(matchId) {
+      fetch(`/trajet/accepter/${matchId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert("Matching accepté !");
+          window.location.href = "/messages/";
+        }
+      });
+    }
+    function declinerMatch(matchId) {
+      fetch(`/trajet/decliner/${matchId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert("Matching décliné.");
+          location.reload();
+        }
+      });
+    }
+  </script>
+{% endblock %} 

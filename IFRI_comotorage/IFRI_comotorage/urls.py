@@ -11,6 +11,7 @@ urlpatterns = [
     path('profile/', include('profileUser.urls')),
     path('acceuil/', views.acceuil, name='acceuil'),
     path('chat/', include('messaging_app.urls')),
+    path('notifs/',include('trajet.urls'))
 ]
 
 if settings.DEBUG:
