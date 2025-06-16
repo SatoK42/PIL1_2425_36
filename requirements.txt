@@ -5,6 +5,7 @@ channels
 channels_redis
 django-phonenumber-field[phonenumbers]
 daphne
+pillow
 
 
 # Si mysqlclient ne fonctionne pas sur votre machine (surtout sous Windows),
