@@ -10,7 +10,6 @@ urlpatterns = [
     path('auth/', include('auth_app.urls')),
     path('profile/', include('profileUser.urls')),
     path('acceuil/', views.acceuil, name='acceuil'),
-    path('edit/', views.edit, name='edit'),
     path('chat/', include('messaging_app.urls')),
 ]
 

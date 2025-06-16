@@ -64,10 +64,28 @@ class UserModelForm(forms.ModelForm):
     
     def save(self, commit=True):
         user = super().save(commit=False)
-        # on hache le mot de passe avant sauvegarde
+        # hachage du mot de passe
         user.password = make_password(self.cleaned_data["password1"])
         if commit:
             user.save()
+            # Après user.save(), le profile existe via votre signal post_save
+            try:
+                profile = user.profile
+            except Exception:
+                profile = None
+            # Définir is_driver selon le rôle choisi
+            role = self.cleaned_data.get('role')
+            if profile:
+                if role == 'conducteur':
+                    profile.is_driver = True
+                else:
+                    profile.is_driver = False
+                    # vider éventuellement les champs véhicule existants
+                    profile.vehicle_type = None
+                    profile.seats = None
+                    profile.brand = ''
+                    profile.model = ''
+                profile.save()
         return user
 
 
@@ -83,7 +101,7 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
         login    = data.get('login')
         password = data.get('password')
         if login and password:
-            # passe les deux dans authenticate(); votre backend décidera
+            
             user = authenticate(username=login, password=password)
             if user is None:
                 raise forms.ValidationError("Identifiant ou mot de passe invalide.")

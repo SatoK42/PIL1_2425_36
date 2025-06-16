@@ -109,27 +109,23 @@ nav {
 .form button:hover{
     color: white;
 }
-.menu-block{
-    display: none;
-}
+
 .menu-container{
-    height: 80vh;
-    width: 450px;
-    max-width: 450px;
     display: flex;
-    justify-content: left;
-    background-color: whitesmoke;
+    flex-direction: row;
+    margin-block: auto;
+    
 }
 .menu-list{
     display: flex;
-    flex-direction: column;
-    align-items: start;
-    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    list-style-type: none;
 }
 .menu-list li{
     display: inline-block;
     padding: 10px;
-    margin-top: 6px;
+    margin-left: 0.6em;
 }
 
 
@@ -183,11 +179,12 @@ fieldset {
 .dropdown-item{
     margin-bottom: 6px;
 }
-@media screen and (min-width:710px) {
-            
+@media screen and (min-width:768px) {
+            .mobile{display: none;}
     }
 @media screen and (max-width: 768px) {
-       /* .container-md{width: 100%;}*/
+       .container-md{width: 100%;}
+       .bar{display: none;}
     }
 
 

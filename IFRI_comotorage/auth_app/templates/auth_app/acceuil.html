@@ -1,48 +1,150 @@
 {% extends 'auth_app/connected.html' %}
-{% load static %}
-
-{% block title %}Accueil - RIDE4IFRI{% endblock %}
-
-
 
 
 {% block content %}
-    
-{% comment %} <svg class="ms-3 d-block ban_clock" viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg">
-  <g filter="url(#boxShadow)">
-    <path d="M 0 0 L 10 0 L 10 8 L 5 12 L 0 8 Z" fill="white" stroke="black" stroke-width="0.3" stroke-opacity="0.4"/>
+<div class="container py-5">
+  <h1 class="mb-4 text-center">Planifier un trajet</h1>
 
-    <!-- Icône centrée -->
-    <g transform="translate(5,3) scale(0.15) translate(-12,-12)" text-anchor="middle">
-        <circle cx="12" cy="12" r="11" fill="none" stroke="black" stroke-width="1"/>
-        <rect width="2" height="7" x="11" y="6" fill="black" rx="1">
-        <animateTransform attributeName="transform" dur="9s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/>
-        </rect>
-        <rect width="2" height="9" x="11" y="11" fill="black" rx="1">
-        <animateTransform attributeName="transform" dur="0.75s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/>
-        </rect>
-    </g>
+  <!-- Nav Pills pour choisir le type -->
+  <ul class="nav nav-pills justify-content-center mb-4" id="tripTypeTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="daily-tab" data-bs-toggle="pill" data-bs-target="#daily" type="button">Quotidien</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="custom-tab" data-bs-toggle="pill" data-bs-target="#custom" type="button">Personnalisé</button>
+    </li>
+  </ul>
 
-    <!-- Texte centré -->
-    <text x="5" y="6.5" font-size="1.1" font-family="Arial" fill="black" text-anchor="middle">00:00:00</text>
-    <text x="5" y="8" font-size="0.9" font-family="Arial" fill="black" text-anchor="middle">avant la prochaine</text>
-    <text x="5" y="9" font-size="0.8" font-family="Arial" fill="black" text-anchor="middle">rencontre</text>
-    </g>
-</svg> {% endcomment %}
-
-
-    <!-- Carte de Trajet -->
-    <div class="card mb-4 shadow">
-        <img src="{% static 'img/trajet.webp' %}"  alt="Trajet">
-        <div class="card-body d-flex justify-content-between">
-            <a href="#" class="btn btn-outline-danger btn-sm">Supprimer</a>
-            <a href="#" class="btn btn-outline-primary btn-sm">Modifier</a>
-        </div>
+  <div class="tab-content">
+    <!-- Formulaire Quotidien -->
+    <div class="tab-pane fade show active" id="daily">
+      <form method="post">
+        {% csrf_token %}
+        {{ daily_form.as_p }}
+        <button name="daily_submit" class="btn btn-primary">Valider trajet quotidien</button>
+      </form>
     </div>
 
-    <!-- Bouton Partager -->
-    <div class="card-body text-center p-4">
-        <a href="#" class="btn btn-partager px-4 py-2 w-100">Partager un nouveau trajet +</a>
+    <!-- Formulaire Personnalisé + carte -->
+    <div class="tab-pane fade" id="custom">
+      <form method="post" id="customForm">
+        {% csrf_token %}
+        {{ custom_form.start_lat }}
+        {{ custom_form.start_lng }}
+        {{ custom_form.end_lat }}
+        {{ custom_form.end_lng }}
+        {{ custom_form.departure_time }}
+        <div id="map" style="height: 400px; margin-bottom: 1rem;"></div>
+        <button class="btn btn-success">Valider trajet personnalisé</button>
+      </form>
     </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS + Leaflet CSS/JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Initialisation de la carte au centre de la maison
+const homeLat = {{ daily_form.initial.departure_lat }};
+const homeLng = {{ daily_form.initial.departure_lng }};
+const map = L.map('map').setView([homeLat, homeLng], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap'
+}).addTo(map);
+
+let startMarker, endMarker;
+
+// Au clic sur la carte, on place les markers
+map.on('click', function(e) {
+  if (!startMarker) {
+    startMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
+    document.getElementById("id_start_lat").value = e.latlng.lat;
+    document.getElementById("id_start_lng").value = e.latlng.lng;
+  } else if (!endMarker) {
+    endMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
+    document.getElementById("id_end_lat").value = e.latlng.lat;
+    document.getElementById("id_end_lng").value = e.latlng.lng;
+  }
+});
+
+// Si on déplace un marker, on met à jour les champs cachés
+function bindDrag(marker, latField, lngField) {
+  marker.on('dragend', function(e) {
+    const pos = e.target.getLatLng();
+    document.getElementById(latField).value = pos.lat;
+    document.getElementById(lngField).value = pos.lng;
+  });
+}
+map.on('layeradd', function(e){
+  if (e.layer === startMarker) bindDrag(startMarker, 'id_start_lat', 'id_start_lng');
+  if (e.layer === endMarker)   bindDrag(endMarker,  'id_end_lat',   'id_end_lng');
+});
+</script>
+{% if require_vehicle_info %}
+  <!-- Modal Bootstrap 5 -->
+  <div class="modal fade" id="vehicleModal" tabindex="-1" aria-labelledby="vehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="vehicle-form" method="post" action="{% url 'profileUser:profile_update_vehicle' %}">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="vehicleModalLabel">Complétez vos infos véhicule</h5>
+          </div>
+          <div class="modal-body">
+            <p>Pour continuer, merci de renseigner les informations sur votre véhicule :</p>
+            {% if vehicle_form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ vehicle_form.non_field_errors }}
+              </div>
+            {% endif %}
+            <div class="mb-3">
+              {{ vehicle_form.vehicle_type.label_tag }}
+              {{ vehicle_form.vehicle_type }}
+              {% for e in vehicle_form.vehicle_type.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ vehicle_form.seats.label_tag }}
+              {{ vehicle_form.seats }}
+              {% for e in vehicle_form.seats.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ vehicle_form.brand.label_tag }}
+              {{ vehicle_form.brand }}
+              {% for e in vehicle_form.brand.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ vehicle_form.model.label_tag }}
+              {{ vehicle_form.model }}
+              {% for e in vehicle_form.model.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          <input type="hidden" name="is_driver" value="True">
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Script pour afficher le modal bloquant -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      var vehicleModal = new bootstrap.Modal(document.getElementById('vehicleModal'), {
+        backdrop: 'static',
+        keyboard: false
+      });
+      vehicleModal.show();
+    });
+  </script>
+{% endif %}
 
 {% endblock %}

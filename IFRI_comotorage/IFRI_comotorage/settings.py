@@ -110,7 +110,7 @@ DATABASES = {
 }
 
 
-LOGIN_URL = 'login1'
+LOGIN_URL = 'login'
 
 
 # Password validation
