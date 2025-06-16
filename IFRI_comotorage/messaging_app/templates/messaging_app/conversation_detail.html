@@ -34,20 +34,28 @@ function chatRoom(convoId, roomTitle) {
     socket: null,
 
     init() {
-      // 1. Charger historique
+      // 1. Charger l'historique
       fetch(`/chat/api/conversations/${convoId}/messages/`)
-        .then(r=>r.json())
-        .then(data=>{
+        .then(r => r.json())
+        .then(data => {
           this.messages = data;
+          this.sortMessages();
           this.scrollBottom();
         });
 
       // 2. Ouvrir la WebSocket
-      const proto = location.protocol==='https:'?'wss':'ws';
+      const proto = location.protocol === 'https:' ? 'wss' : 'ws';
       this.socket = new WebSocket(`${proto}://${location.host}/ws/chat/${convoId}/`);
-      this.socket.addEventListener('message', e=>{
-        this.messages.push(JSON.parse(e.data));
-        this.scrollBottom();
+
+      this.socket.addEventListener('message', e => {
+        const newMsg = JSON.parse(e.data);
+        console.log("Frame WS reçu :", newMsg);
+        // ← Filtrer les doublons d’ID
+        if (!this.messages.find(m => m.id === newMsg.id)) {
+          this.messages.push(newMsg);
+          this.sortMessages();
+          this.scrollBottom();
+        }
       });
     },
 
@@ -59,6 +67,10 @@ function chatRoom(convoId, roomTitle) {
 
     scrollBottom() {
       this.$refs.msgs.scrollTop = this.$refs.msgs.scrollHeight;
+    },
+
+    sortMessages() {
+      this.messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
     }
   }
 }

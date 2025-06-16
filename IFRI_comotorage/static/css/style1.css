@@ -200,6 +200,7 @@ fieldset {
     bottom: 0;
     z-index: 100;
     background: #a7a7a7;
+    z-index: 100;
 }
 
 .nav_items{

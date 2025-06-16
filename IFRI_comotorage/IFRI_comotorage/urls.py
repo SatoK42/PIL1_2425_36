@@ -8,7 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.register, name='register'),
     path('auth/', include('auth_app.urls')),
-    path('profile/', views.profile, name='profile'),
+    path('profile/', include('profileUser.urls')),
     path('acceuil/', views.acceuil, name='acceuil'),
     path('edit/', views.edit, name='edit'),
     path('chat/', include('messaging_app.urls')),
@@ -16,3 +16,6 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

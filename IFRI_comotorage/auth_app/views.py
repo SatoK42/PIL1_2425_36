@@ -32,10 +32,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from profileUser.models import Profile  # ajuste si ton modèle s’appelle Profil
 
-@login_required
-def profile(request):
-    profile, created = Profile.objects.get_or_create(user=request.user)
-    return render(request, 'auth_app/profile.html', {'profile': profile})
 
 
 def acceuil(request):

@@ -1,0 +1,86 @@
+{% extends 'auth_app/connected.html' %}
+{% load static %}
+{% block content %}
+<div class="container py-4 mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-whk">
+          <h3 class="mb-0">Mon profil</h3>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-4">
+            {% if profile.photo %}
+              <img src="{{ profile.photo.url }}" alt="Photo de profil" class="rounded-circle" style="width:100px; height:100px; object-fit:cover;">
+            {% else %}
+              <img src="{% static 'img/default_avatar.png' %}" alt="Avatar par défaut" class="rounded-circle" style="width:100px; height:100px; object-fit:cover;">
+            {% endif %}
+            <div class="ms-3">
+              <h4>{{ request.user.get_full_name|default:request.user.username }}</h4>
+              <p class="text-muted">{{ request.user.email }}</p>
+            </div>
+          </div>
+          <ul class="list-group list-group-flush">
+            {% if profile.is_driver %}
+              <li class="list-group-item"><strong>Conducteur :</strong> Oui</li>
+              <li class="list-group-item"><strong>Type de véhicule :</strong> {{ profile.get_vehicle_type_display }}</li>
+              <li class="list-group-item"><strong>Nombre de places :</strong> {{ profile.seats }}</li>
+              {% if profile.brand %}
+                <li class="list-group-item"><strong>Marque :</strong> {{ profile.brand }}</li>
+              {% endif %}
+              {% if profile.model %}
+                <li class="list-group-item"><strong>Modèle :</strong> {{ profile.model }}</li>
+              {% endif %}
+            {% else %}
+              <li class="list-group-item"><strong>Conducteur :</strong> Non</li>
+            {% endif %}
+
+            {% if profile.departure_time %}
+              <li class="list-group-item"><strong>Heure de départ habituelle :</strong> {{ profile.departure_time }}</li>
+            {% endif %}
+            {% if profile.departure_lat and profile.departure_lng %}
+              <li class="list-group-item">
+                <strong>Point de départ :</strong>
+            
+                <div id="map-view" style="width:160px; height:120px; border:1px solid #ccc;"></div>
+              </li>
+            {% endif %}
+          </ul>
+          <div class="mt-4">
+            <a href="{% url 'profileUser:profile_edit' %}" class="btn bg-g col-wh">Modifier le profil</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if profile.departure_lat and profile.departure_lng %}
+  <!-- Inclure Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const lat = parseFloat("{{ profile.departure_lat }}");
+      const lng = parseFloat("{{ profile.departure_lng }}");
+      const map = L.map('map-view', {
+        center: [lat, lng],
+        zoom: 13,
+        /*attributionControl: false,
+        zoomControl: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        tap: false,
+        touchZoom: false*/
+      });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: ''
+      }).addTo(map);
+      L.marker([lat, lng]).addTo(map);
+    });
+  </script>
+{% endif %}
+{% endblock %}

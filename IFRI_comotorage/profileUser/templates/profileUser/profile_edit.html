@@ -1,0 +1,231 @@
+{% extends 'auth_app/connected.html' %}
+{% load static %}
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h3 class="mb-0">Modifier mon profil</h3>
+        </div>
+        <div class="card-body">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- Champs User -->
+            <div class="mb-3">
+              {{ u_form.first_name.label_tag }}
+              {{ u_form.first_name }}
+              {% for e in u_form.first_name.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ u_form.last_name.label_tag }}
+              {{ u_form.last_name }}
+              {% for e in u_form.last_name.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ u_form.email.label_tag }}
+              {{ u_form.email }}
+              {% for e in u_form.email.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+
+            <hr>
+
+            <!-- Photo de profil -->
+            <div class="mb-3">
+              {{ p_form.photo.label_tag }}<br>
+              {% if request.user.profile.photo %}
+                <img id="current-avatar" src="{{ request.user.profile.photo.url }}" alt="Avatar actuel"
+                     class="rounded-circle mb-2" style="width:80px; height:80px; object-fit:cover;">
+              {% endif %}
+              {{ p_form.photo }}
+              {% for e in p_form.photo.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+
+            <hr>
+
+            <!-- Is driver -->
+            <div class="form-check form-switch mb-3">
+              {{ p_form.is_driver }} 
+              {{ p_form.is_driver.label_tag }}
+              {% for e in p_form.is_driver.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+
+            <!-- Bloc infos véhicule -->
+            <div id="vehicle-info" style="{% if not request.user.profile.is_driver %}display:none;{% endif %}">
+              <div class="mb-3">
+                {{ p_form.vehicle_type.label_tag }}
+                {{ p_form.vehicle_type }}
+                {% for e in p_form.vehicle_type.errors %}
+                  <div class="text-danger small">{{ e }}</div>
+                {% endfor %}
+              </div>
+              <div class="mb-3">
+                {{ p_form.seats.label_tag }}
+                {{ p_form.seats }}
+                {% for e in p_form.seats.errors %}
+                  <div class="text-danger small">{{ e }}</div>
+                {% endfor %}
+              </div>
+              <div class="mb-3">
+                {{ p_form.brand.label_tag }}
+                {{ p_form.brand }}
+                {% for e in p_form.brand.errors %}
+                  <div class="text-danger small">{{ e }}</div>
+                {% endfor %}
+              </div>
+              <div class="mb-3">
+                {{ p_form.model.label_tag }}
+                {{ p_form.model }}
+                {% for e in p_form.model.errors %}
+                  <div class="text-danger small">{{ e }}</div>
+                {% endfor %}
+              </div>
+            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function(){
+                    const chk = document.getElementById('id_is_driver');
+                    const bloc = document.getElementById('vehicle-info');
+                    const toggle = () => {
+                    if (chk.checked) bloc.style.display = '';
+                    else bloc.style.display = 'none';
+                    };
+                    // initial
+                    toggle();
+                    // au changement
+                    chk.addEventListener('change', toggle);
+                });
+            </script>
+
+            <hr>
+
+            <!-- Trajet quotidien -->
+            <div class="mb-3">
+              {{ p_form.departure_time.label_tag }}
+              {{ p_form.departure_time }}
+              {% for e in p_form.departure_time.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              <label>Point de départ habituel</label><br>
+              <!-- Aperçu Leaflet 80x80 -->
+              <div id="map-preview" style="width:160px; height:120px; border:1px solid #ccc;"></div>
+              <!-- Champs cachés lat/lng -->
+              {{ p_form.departure_lat }}
+              {{ p_form.departure_lng }}
+              {% if p_form.departure_lat.errors or p_form.departure_lng.errors %}
+                <div class="text-danger small">
+                  {% for e in p_form.departure_lat.errors %}{{ e }} {% endfor %}
+                  {% for e in p_form.departure_lng.errors %}{{ e }}{% endfor %}
+                </div>
+              {% endif %}
+              <small class="form-text text-muted">Cliquez sur la carte pour définir votre point de départ.</small>
+            </div>
+
+            <button type="submit" class="btn btn-success">Enregistrer</button>
+            <a href="{% url 'profileUser:profile' %}" class="btn btn-secondary ms-2">Annuler</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Inclure Leaflet CSS/JS (CDN) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+// Gestion affichage bloc véhicule
+document.addEventListener('DOMContentLoaded', function() {
+  const isDriverCheckbox = document.getElementById('id_is_driver');
+  const vehicleInfoDiv = document.getElementById('vehicle-info');
+  if (isDriverCheckbox) {
+    isDriverCheckbox.addEventListener('change', function() {
+      if (this.checked) {
+        vehicleInfoDiv.style.display = '';
+      } else {
+        vehicleInfoDiv.style.display = 'none';
+        // vider les champs si nécessaire:
+        ['id_vehicle_type','id_seats','id_brand','id_model'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            if (el.tagName === 'INPUT') el.value = '';
+            else if (el.tagName === 'SELECT') el.selectedIndex = 0;
+          }
+        });
+      }
+    });
+  }
+
+  // Leaflet map preview 80x80
+  const latInput = document.getElementById('id_departure_lat');
+  const lngInput = document.getElementById('id_departure_lng');
+  const mapDiv = document.getElementById('map-preview');
+
+  // Coordonnées initiales: si déjà sauvegardées, sinon centre par défaut
+  let initLat = parseFloat(latInput.value) || 0;
+  let initLng = parseFloat(lngInput.value) || 0;
+  let hasCoord = !isNaN(initLat) && !isNaN(initLng) && initLat !== 0 && initLng !== 0;
+
+  // Choisir un centre par défaut si pas de coord: on peut centrer sur une position générique ou ne rien afficher
+  const defaultCenter = hasCoord ? [initLat, initLng] : [0, 0];
+
+  const map = L.map(mapDiv, {
+    center: defaultCenter,
+    zoom: hasCoord ? 13 : 2,
+    /*attributionControl: false,
+    zoomControl: false,
+    dragging: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    boxZoom: false,
+    keyboard: false,
+    tap: false,
+    touchZoom: false*/
+  });
+  // couche basique OpenStreetMap
+  L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap France'
+}).addTo(map);
+
+  let marker;
+  if (hasCoord) {
+    marker = L.marker([initLat, initLng]).addTo(map);
+  }
+
+  // Pour définir la coord via clic: on agrandit temporairement la map? Ici, si on clique, on récupère lat/lng
+  mapDiv.style.cursor = 'pointer';
+  map.on('click', function(e) {
+    const {lat, lng} = e.latlng;
+    // Si premier marker, on l’ajoute, sinon on déplace
+    if (!marker) {
+      marker = L.marker([lat, lng]).addTo(map);
+    } else {
+      marker.setLatLng([lat, lng]);
+    }
+    // Met à jour les inputs cachés
+    latInput.value = lat.toFixed(6);
+    lngInput.value = lng.toFixed(6);
+  });
+});
+</script>
+{% endblock %}
