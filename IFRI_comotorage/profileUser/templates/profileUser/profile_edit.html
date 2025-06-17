@@ -127,7 +127,7 @@
             <div class="mb-3">
               <label>Point de départ habituel</label><br>
               <!-- Aperçu Leaflet 80x80 -->
-              <div id="map-preview" style="width:160px; height:120px; border:1px solid #ccc;"></div>
+              <div id="map-preview" style="width:460px; height:220px; border:1px solid #ccc;"></div>
               <!-- Champs cachés lat/lng -->
               {{ p_form.departure_lat }}
               {{ p_form.departure_lng }}
@@ -152,6 +152,7 @@
 <!-- Inclure Leaflet CSS/JS (CDN) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
 <script>
 // Gestion affichage bloc véhicule
