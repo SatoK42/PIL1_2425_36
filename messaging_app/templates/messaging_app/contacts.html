@@ -1,0 +1,15 @@
+{% extends 'auth_app/connected.html' %}
+
+{% block content %}
+  <h1>Mes contacts</h1>
+<ul>
+  {% for user in users %}
+    <li>
+      {{ user.username }}
+      <a href="{% url 'start_private_chat' user.id %}">
+        📩 Envoyer un message
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

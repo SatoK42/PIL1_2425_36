@@ -1,0 +1,111 @@
+{% extends 'auth_app/connected.html' %}
+{% block content %}
+<div style="display:flex; height: 80vh;">
+  <aside style="width:300px; border-right:1px solid #ddd; overflow-y:auto; padding:10px;">
+    <h2>Conversations</h2>
+    {% for conv in conversations %}
+      <div style="padding:8px; cursor:pointer; border-bottom:1px solid #eee; {% if conv.id == active_conversation.id %}background:#d9ebff;{% endif %}"
+           onclick="window.location.href='{% url 'messaging:conversation_detail' conv.id %}'">
+        <strong>
+          {% if conv.is_group %}{{ conv.name }}{% else %}
+            {% for u in conv.participants.all %}
+              {% if u != request.user %}{{ u.get_full_name|default:u.username }}{% endif %}
+            {% endfor %}
+          {% endif %}
+        </strong><br>
+        <small>{{ conv.latest_message.timestamp|date:"d/m H:i" }}</small><br>
+        <small style="color:#666;">
+          {{ conv.latest_message.text|truncatechars:30 }}
+        </small>
+      </div>
+    {% empty %}
+      <p>Aucune conversation.</p>
+    {% endfor %}
+  </aside>
+
+  <section style="flex:1; display:flex; flex-direction: column;">
+    <header style="padding: 10px; border-bottom: 1px solid #ddd; font-weight:bold; font-size:1.2em;">
+      {% if active_conversation.is_group %}
+        {{ active_conversation.name }}
+      {% else %}
+        {% for u in active_conversation.participants.all %}
+          {% if u != request.user %}{{ u.get_full_name|default:u.username }}{% endif %}
+        {% endfor %}
+      {% endif %}
+    </header>
+        <main id="chat-log" style="flex:1; overflow-y:auto; padding:10px; background:#e5ddd5;">
+      {% for msg in messages %}
+        <div style="max-width: 60%; margin-bottom: 10px; padding:8px 12px; border-radius:10px; clear:both; 
+          background: {% if msg.sender == request.user %}#dcf8c6{% else %}#fff{% endif %}; 
+          float: {% if msg.sender == request.user %}right{% else %}left{% endif %};">
+          <div style="font-weight:bold; font-size:0.85em; margin-bottom:3px;">
+            {{ msg.sender.get_full_name|default:msg.sender.username }}
+          </div>
+          <div>{{ msg.text }}</div>
+        </div>
+      {% endfor %}
+    </main>
+    <footer style="border-top: 1px solid #ddd; padding: 10px; display:flex;"></footer>
+
+<textarea id="chat-message-input" rows="2" style="flex:1; resize:none; padding:10px;" placeholder="Écrire un message..."></textarea>
+      <button id="chat-message-submit" style="margin-left:10px; padding:10px 20px; background:#0084ff; color:#fff; border:none; border-radius:4px; cursor:pointer;">
+        Envoyer
+      </button>
+    </footer>
+  </section>
+</div>
+
+<script>
+  const convoId = {{ active_conversation.id }};
+  const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+  const chatSocket = new WebSocket(wsScheme://{window.location.host}/ws/chat/${convoId}/);
+
+  chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    const chatLog = document.getElementById('chat-log');
+
+    const div = document.createElement('div');
+    div.style.maxWidth = '60%';
+    div.style.marginBottom = '10px';
+    div.style.padding = '8px 12px';
+    div.style.borderRadius = '10px';
+    div.style.clear = 'both';
+    div.style.background = (data.author === "{{ request.user.username }}") ? '#dcf8c6' : '#fff';
+    div.style.float = (data.author === "{{ request.user.username }}") ? 'right' : 'left';
+
+    const authorDiv = document.createElement('div');
+    authorDiv.style.fontWeight = 'bold';
+    authorDiv.style.fontSize = '0.85em';
+
+    authorDiv.style.marginBottom = '3px';
+    authorDiv.textContent = data.author;
+
+    const textDiv = document.createElement('div');
+    textDiv.textContent = data.message;
+
+    div.appendChild(authorDiv);
+    div.appendChild(textDiv);
+
+    chatLog.appendChild(div);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  };
+  
+
+
+  document.getElementById('chat-message-submit').onclick = () => {
+    const input = document.getElementById('chat-message-input');
+    const message = input.value.trim();
+    if (!message) return;
+    chatSocket.send(JSON.stringify({ message }));
+    input.value = '';
+  };
+
+  window.onload = () => {
+    const chatLog = document.getElementById('chat-log');
+    chatLog.scrollTop = chatLog.scrollHeight;
+  };
+</script>
+
+{% endblock %}
+{% block title %}Conversation - Ride4UAC{% endblock %}
+

@@ -1,0 +1,78 @@
+{% extends 'auth_app/connected.html' %}
+{% block content %}
+<div 
+  x-data="chatRoom({{ conversation.id }}, '{{ room_title|escapejs }}')" x-init="init()"
+  class="p-4"
+>
+  <h2 x-text="title"></h2>
+  <div id="messages" class="mb-3" x-ref="msgs" style="max-height:400px; overflow-y:auto">
+    <template x-for="m in messages" :key="m.id">
+      <p><strong x-text="m.sender"></strong>: <span x-text="m.text"></span></p>
+    </template>
+  </div>
+
+  <textarea 
+    x-ref="input" 
+    x-model="draft" 
+    rows="2" 
+    class="form-control" 
+    placeholder="Écrire un message..."
+  ></textarea>
+  <button 
+    @click="send()" 
+    class="btn btn-primary mt-2"
+  >Envoyer</button>
+</div>
+
+<script>
+function chatRoom(convoId, roomTitle) {
+  return {
+    convoId,
+    title: roomTitle,
+    messages: [],
+    draft: '',
+    socket: null,
+
+    init() {
+      // 1. Charger l'historique
+      fetch(`/chat/api/conversations/${convoId}/messages/`)
+        .then(r => r.json())
+        .then(data => {
+          this.messages = data;
+          this.sortMessages();
+          this.scrollBottom();
+        });
+
+      // 2. Ouvrir la WebSocket
+      const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+      this.socket = new WebSocket(`${proto}://${location.host}/ws/chat/${convoId}/`);
+
+      this.socket.addEventListener('message', e => {
+        const newMsg = JSON.parse(e.data);
+        console.log("Frame WS reçu :", newMsg);
+        // ← Filtrer les doublons d’ID
+        if (!this.messages.find(m => m.id === newMsg.id)) {
+          this.messages.push(newMsg);
+          this.sortMessages();
+          this.scrollBottom();
+        }
+      });
+    },
+
+    send() {
+      if (!this.draft.trim()) return;
+      this.socket.send(JSON.stringify({ text: this.draft }));
+      this.draft = '';
+    },
+
+    scrollBottom() {
+      this.$refs.msgs.scrollTop = this.$refs.msgs.scrollHeight;
+    },
+
+    sortMessages() {
+      this.messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    }
+  }
+}
+</script>
+{% endblock %}

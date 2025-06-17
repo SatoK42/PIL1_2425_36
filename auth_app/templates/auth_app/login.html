@@ -1,0 +1,29 @@
+{% extends "auth_app/log.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="form row mb-5">
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                {% for field in form %}
+                  <div class="mb-3">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% for error in field.errors %}
+                      <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+                {% if form.non_field_errors %}
+                  <div class="text-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <button type="submit" class="btn bg-g mt-2 mb-3 col-wh">Se connecter</button>
+            </form>
+            <p class="text-center">Vous n’êtes pas encore inscrit? <a href="{% url 'register' %}">S'inscrire</a></p>
+        </div>
+        <div class="container mt-5"><hr></div>
+        <p class="text-center">© 2025 PANTAGONE</p>
+    </div>
+ {% endblock %}
