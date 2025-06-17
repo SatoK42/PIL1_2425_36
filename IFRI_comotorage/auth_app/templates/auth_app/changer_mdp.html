@@ -1,0 +1,15 @@
+{% extends 'auth_app/log.html' %}
+{% block title %}Changer le mot de passe{% endblock %}
+
+{% block content %}
+<h2>Changer le mot de passe</h2>
+<form method="POST">
+    {% csrf_token %}
+    <label>Nouveau mot de passe :</label><br>
+    <input type="password" name="mdp1" required><br><br>
+    <label>Confirmer le mot de passe :</label><br>
+    <input type="password" name="mdp2" required><br><br>
+    <button type="submit">Valider</button>
+</form>
+<p style="color:red;">{{ message }}</p>
+{%endblock%}

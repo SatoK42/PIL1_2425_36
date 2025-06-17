@@ -52,3 +52,50 @@ def acceuil(request):
 def logout(request):
     django_logout(request)
     return HttpResponseRedirect('/auth/login/')
+
+def verification_utilisateur(request):
+    message = ""
+    if request.method == "POST":
+        identifiant = request.POST.get("identifiant")
+
+        try:
+            utilisateur = Users.objects.get(email=identifiant)
+        except ObjectDoesNotExist:
+            try:
+                utilisateur = Users.objects.get(phone_number=identifiant)
+            except ObjectDoesNotExist:
+                utilisateur = None
+
+        if utilisateur:
+            return redirect('changer_mdp', utilisateur_id=utilisateur.id)
+        else:
+            message = "Aucun utilisateur trouvé avec cet identifiant."
+
+    return render(request, 'auth_app/verification.html', {"message": message})
+
+
+# Page pour changer le mot de passe
+def changer_mdp(request, utilisateur_id):
+    try:
+        utilisateur = Users.objects.get(id=utilisateur_id)
+    except Users.DoesNotExist:
+        return redirect('reinitialiser')
+
+    message = ""
+
+    if request.method == "POST":
+        mdp1 = request.POST.get("mdp1")
+        mdp2 = request.POST.get("mdp2")
+
+        if mdp1 == mdp2:
+            utilisateur.set_password(mdp1)  # ✅ Hachage correct
+            utilisateur.save()
+            return redirect('login')  # 🔁 Change selon le nom de ta page de login
+        else:
+            message = "Les mots de passe ne correspondent pas."
+
+    return render(request, 'auth_app/changer_mdp.html', {"message": message})
+
+
+
+
