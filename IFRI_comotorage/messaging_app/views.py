@@ -41,43 +41,32 @@ def api_conversations(request):
 def api_messages(request, convo_id):
     convo = get_object_or_404(Conversation, id=convo_id, participants=request.user)
     msgs = Message.objects.filter(conversation=convo).order_by('timestamp')
-    data = [
-        {
+    data = []
+    for m in msgs:
+        # Protection contre les messages sans sender
+        if m.sender is None:
+            continue
+        data.append({
           'id': m.id,
-          'sender': m.sender.get_full_name() or m.sender.email,
+          'sender': m.sender.username,
+          'sender_display': m.sender.get_full_name() or m.sender.email,
           'text': m.text,
           'timestamp': m.timestamp.isoformat()
-        }
-        for m in msgs
-    ]
+        })
     return JsonResponse(data, safe=False)
 
 
 @login_required
-def search_users(request):
-    q = request.GET.get('q', '').strip()
-    qs = User.objects.filter(email__icontains=q)[:10]
-    data = [
-        {
-          'id': u.id,
-          'email': u.email,
-          'name': u.get_full_name() or ''
-        }
-        for u in qs
-    ]
-    return JsonResponse(data, safe=False)
+def conversation_main(request, convo_id=None):
+    conversations = Conversation.objects.filter(participants=request.user)
+    active_conversation = None
+    if convo_id:
+        active_conversation = get_object_or_404(Conversation, id=convo_id, participants=request.user)
 
-
-@login_required
-def conversation_list(request):
-    convs = (
-        Conversation.objects
-        .filter(participants=request.user)
-        .annotate(last_msg=Max('messages__timestamp'))
-        .order_by('-last_msg')
-    )
-    return render(request, 'messaging_app/conversation_list.html', {
-        'conversations': convs
+    return render(request, 'messaging_app/conversation_main.html', {
+        'conversations': conversations,
+        'active_conversation': active_conversation,
+        'active_conversation_id': convo_id
     })
 
 @login_required

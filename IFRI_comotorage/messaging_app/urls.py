@@ -4,9 +4,10 @@ from . import views
 app_name = 'messaging'
 
 urlpatterns = [
-    path('', views.conversation_list, name='list'),
+    path('', views.conversation_main, name='main'),
     path('new/', views.new_conversation, name='new_conversation'),
     path('chat/<int:convo_id>/', views.conversation_detail, name='conversation_detail'),
+    path('main/<int:convo_id>/', views.conversation_main, name='conversation_main'),
     path('search-users/', views.search_users, name='search_users'),
     path('api/conversations/', views.api_conversations, name='api_conversations'),
     path('api/conversations/<int:convo_id>/messages/', views.api_messages, name='api_messages'),

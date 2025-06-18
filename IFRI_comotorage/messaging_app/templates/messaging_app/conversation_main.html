@@ -1,0 +1,56 @@
+<!-- conversation_main.html -->
+{% extends 'auth_app/connected.html' %}
+
+{% block content %}
+<style>
+/* Annuler la contrainte du container-md pour la messagerie */
+body.container-md {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Ajuster la hauteur pour tenir compte de la navbar */
+.messaging-container {
+    height: calc(100vh - 120px) !important;
+    margin-top: 0 !important;
+}
+</style>
+
+<div class="messaging-container">
+  <div class="sidebar">
+    <!-- Liste des conversations (sidebar) -->
+    {% include 'messaging_app/conversation_list.html' %}
+  </div>
+  <div class="chat-window">
+    {% if active_conversation %}
+      {% include 'messaging_app/conversation_detail.html' %}
+    {% else %}
+      <div class="text-center m-4 text-muted">
+        <p>Sélectionnez une conversation à gauche</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function showChat() {
+  document.querySelector('.messaging-container').classList.add('show-chat');
+}
+function showSidebar() {
+  document.querySelector('.messaging-container').classList.remove('show-chat');
+}
+
+// Auto-hide sidebar on mobile when conversation is active
+document.addEventListener('DOMContentLoaded', function() {
+  const messagingContainer = document.querySelector('.messaging-container');
+  const chatWindow = document.querySelector('.chat-window');
+  const sidebar = document.querySelector('.sidebar');
+  
+  // Si on est sur mobile et qu'une conversation est active
+  if (window.innerWidth < 768 && chatWindow.children.length > 1) {
+    messagingContainer.classList.add('show-chat');
+  }
+});
+</script>
+{% endblock %}

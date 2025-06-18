@@ -1,24 +1,23 @@
-{% extends 'auth_app/connected.html' %}
-{% block content %}
-  <h2>Mes conversations</h2>
-  {% if conversations %}
-    <ul class="list-group">
-      {% for c in conversations %}
-        <li class="list-group-item">
-          <a href="{% url 'messaging:conversation_detail' c.id %}">
+<h2 class="sidebar-title d-none d-md-block">Mes conversations</h2>
+{% if conversations %}
+  <ul class="conversation-list">
+    {% for c in conversations %}
+      <li class="conversation-item{% if c.id == active_conversation_id %} active{% endif %}">
+        <a href="{% url 'messaging:conversation_main' c.id %}">
+          <span class="conversation-name">
             {% if c.is_group %}{{ c.name }}
             {% else %}
               {% for u in c.participants.all %}
                 {% if u != request.user %}{{ u.get_full_name|default:u.email }}{% endif %}
               {% endfor %}
             {% endif %}
-          </a>
-          <span class="float-end">{{ c.last_msg|date:"d/m H:i" }}</span>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>Aucune conversation pour l’instant. </p>
-  {% endif %}
-  <a href="{% url 'messaging:new_conversation' %}">Nouveau chat</a>
-{% endblock %}
+          </span>
+          <span class="conversation-date float-end">{{ c.last_msg|date:"d/m H:i" }}</span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Aucune conversation pour l'instant. </p>
+{% endif %}
+<a href="{% url 'messaging:new_conversation' %}" class="btn btn-success w-100 mt-3">Nouveau chat</a>

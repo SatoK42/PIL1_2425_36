@@ -54,7 +54,8 @@ python manage.py runserver
 ### 7. Lancer le serveur ASGI (pour WebSocket/Channels)
 
 ```
-python -m daphne IFRI_comotorage.IFRI_comotorage.asgi:application
+cd IFRI_comotorage
+python -m daphne -b 0.0.0.0 -p 8000 IFRI_comotorage.asgi:application
 ```
 
 ## Structure du projet
@@ -84,6 +85,33 @@ python -m daphne IFRI_comotorage.IFRI_comotorage.asgi:application
 
 - Pour le développement sous Windows, si `mysqlclient` pose problème, voir les instructions dans `requirements.txt` pour utiliser PyMySQL.
 - Pour la messagerie en temps réel, assurez-vous que Redis est installé et configuré si vous utilisez `channels_redis`.
+
+> Attention :
+> Si vous obtenez une erreur du type
+> django.db.utils.OperationalError: (1045, "Access denied for user 'root'@'localhost' (using password: NO)"),
+> cela signifie que Django n’arrive pas à se connecter à la base de données MySQL, généralement parce que le nom d’utilisateur, le mot de passe ou les paramètres de connexion sont incorrects ou manquants dans votre configuration.
+>Vérifiez que les variables d’environnement DB_USER et DB_PASSWORD sont bien définies dans votre fichier .env et correspondent à un utilisateur MySQL valide.
+
+## Configuration du fichier .env
+
+
+Exemple de contenu du fichier `.env` :
+
+```
+SECRET_KEY=ta_cle_secrete_django
+DEBUG=False
+ALLOWED_HOSTS=localhost,127.0.0.1,ton_domaine.com
+DB_NAME=nom_de_ta_base
+DB_USER=utilisateur_mysql
+DB_PASSWORD=mot_de_passe_mysql
+DB_HOST=localhost
+DB_PORT=3306
+EMAIL_HOST_USER=ton_email@example.com
+EMAIL_HOST_PASSWORD=mot_de_passe_email
+```
+
+**N'oublie pas d'adapter ces valeurs à ta configuration !**
+
 
 ## Auteurs
 

@@ -47,7 +47,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
         payload = {
             'id' : message.id,
-            'sender': user.get_full_name(),
+            'sender': user.username,
+            'sender_display': user.get_full_name() or user.email,
             'text': message.text,
             'timestamp': message.timestamp.isoformat()
         }
