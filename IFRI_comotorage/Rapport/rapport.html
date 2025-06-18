@@ -388,7 +388,9 @@
               <div class="member-name">💬 LISSANON Fiacre</div>
               <div class="member-role">
                 <strong>Messaging System Developer</strong><br>
-                • Template de la messagerie<br>
+                • Essai de réalisation du template de la messagerie<br>
+                • Très grande indisponibilité<br>
+                • Contributions mineures au projet
               </div>
             </div>
           </div>
@@ -427,7 +429,7 @@
             <strong>SGBD :</strong> MySQL<br>
             <strong>Modèle Utilisateur :</strong> Hérite de <code>AbstractUser</code> Django<br>
             <strong>Authentification :</strong> Email comme identifiant unique<br>
-            <strong>Nom de la base :</strong> <code>ifri_comotorage</code>
+            <strong>Nom de la base :</strong> <code>django</code>
           </div>
 
           <h3 class="subsection-title">Technologies Utilisées</h3>
@@ -462,11 +464,10 @@
               <li>Créer un environnement virtuel : <code>python -m venv env</code></li>
               <li>Activer l'environnement virtuel : <code>env\Scripts\activate</code> (Windows) ou <code>source env/bin/activate</code> (Linux/Mac)</li>
               <li>Installer les dépendances : <code>pip install -r requirements.txt</code></li>
-              <li>Créer la base de données <code>ifri_comotorage</code> dans MySQL</li>
+              <li>Créer la base de données <code>django</code> dans MySQL</li>
               <li>Configurer les paramètres de base de données dans <code>settings.py</code></li>
               <li>Appliquer les migrations : <code>python manage.py migrate</code></li>
-              <li>Créer un superutilisateur : <code>python manage.py createsuperuser</code></li>
-              <li>Lancer le serveur de développement : <code>python manage.py runserver</code></li>
+              <li>Lancer Daphne pour démarrer le serveur ASGI : <code>daphne -b 0.0.0.0 -p 8000 IFRI_comotorage.asgi:application</code></li>
             </ol>
           </div>
         </div>

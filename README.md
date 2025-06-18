@@ -15,45 +15,38 @@ Plateforme de covoiturage universitaire avec messagerie en temps réel, gestion 
 ### Prérequis
 
 - Python 3.11 ou supérieur
-- MySQL (ou autre SGBD compatible)
+- MySQL 
 - pip
 
 ### 1. Cloner le dépôt
 
-Placez-vous dans le dossier du projet.
+```bash
+git clone https://github.com/SatoK42/PIL1_2425_36.git
+cd PIL1_2425_36
+```
 
 ### 2. Installer les dépendances
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
 ### 3. Configuration de la base de données
 
-- Créez une base de données MySQL.
-- Configurez les paramètres dans `IFRI_comotorage/IFRI_comotorage/settings.py` (section `DATABASES`).
+- Installez [WampServer](https://sourceforge.net/projects/wampserver/) sur votre machine (en suivant les instructions du site officiel).
+- Lancez WampServer puis ouvrez phpMyAdmin (généralement accessible via http://localhost/phpmyadmin).
+- Créez une nouvelle base de données:django .
+- Notez le nom de la base, l'utilisateur et le mot de passe que vous utiliserez dans le fichier `.env`.
+- Une fois la base créée, poursuivez avec les étapes suivantes :
 
-### 4. Appliquer les migrations
-
-```
+```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 5. Créer un superutilisateur
+- Enfin, lancez Daphne pour démarrer le serveur ASGI :
 
-```
-python manage.py createsuperuser
-```
-
-### 6. Lancer le serveur en mode développement
-
-```
-python manage.py runserver
-```
-
-### 7. Lancer le serveur ASGI (pour WebSocket/Channels)
-
-```
+```bash
 cd IFRI_comotorage
 python -m daphne -b 0.0.0.0 -p 8000 IFRI_comotorage.asgi:application
 ```
@@ -89,8 +82,8 @@ python -m daphne -b 0.0.0.0 -p 8000 IFRI_comotorage.asgi:application
 > Attention :
 > Si vous obtenez une erreur du type
 > django.db.utils.OperationalError: (1045, "Access denied for user 'root'@'localhost' (using password: NO)"),
-> cela signifie que Django n’arrive pas à se connecter à la base de données MySQL, généralement parce que le nom d’utilisateur, le mot de passe ou les paramètres de connexion sont incorrects ou manquants dans votre configuration.
->Vérifiez que les variables d’environnement DB_USER et DB_PASSWORD sont bien définies dans votre fichier .env et correspondent à un utilisateur MySQL valide.
+> cela signifie que Django n'arrive pas à se connecter à la base de données MySQL, généralement parce que le nom d'utilisateur, le mot de passe ou les paramètres de connexion sont incorrects ou manquants dans votre configuration.
+>Vérifiez que les variables d'environnement DB_USER et DB_PASSWORD sont bien définies dans votre fichier .env et correspondent à un utilisateur MySQL valide.
 
 ## Configuration du fichier .env
 
