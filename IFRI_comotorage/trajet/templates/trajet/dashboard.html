@@ -1,0 +1,168 @@
+{% extends 'auth_app/connected.html' %}
+
+{% block content %}
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+  {% endif %}
+  {% for field in form %}
+    {% for err in field.errors %}
+      <div class="alert alert-danger">{{ field.label }}: {{ err }}</div>
+    {% endfor %}
+  {% endfor %}
+  <h2>Publier un trajet</h2>
+  <form method="post" id="trajet-form">{% csrf_token %}
+    <div>
+      {{ form.mode.label_tag }}
+      {{ form.mode }}
+    </div>
+
+    <!-- Champs pour trajet ponctuel : date et heure -->
+    <div id="field-date" style="display: none; margin-top: 0.5em;">
+      {{ form.date.label_tag }} {{ form.date }}
+    </div>
+    <div id="field-heure" style="display: none; margin-top: 0.5em;">
+      {{ form.heure.label_tag }} {{ form.heure }}
+    </div>
+
+    <!-- Carte Leaflet pour définir point de départ ponctuel -->
+    <div id="map-container" style="display: none; margin-top: 0.5em;">
+      <label>Choisissez le point de départ :</label>
+      <div id="map" style="height: 300px; margin-top: 0.5em;"></div>
+      {{ form.latitude_depart }} {{ form.longitude_depart }}
+    </div>
+
+    <!-- Commentaire toujours visible -->
+    <div style="margin-top: 0.5em;">
+      {{ form.commentaire.label_tag }}
+      {{ form.commentaire }}
+    </div>
+
+    <button type="submit" style="margin-top: 1em;">Publier</button>
+  </form>
+
+  <hr style="margin: 2em 0;">
+
+  <h2>Mes trajets</h2>
+  <ul>
+    {% for t in trajets %}
+      <li style="margin-bottom: 1em;">
+        <strong>#{{ t.id }}</strong> –
+        {% if t.recurring %}
+          Trajet quotidien à {{ t.heure }}
+        {% else %}
+          Le {{ t.date }} à {{ t.heure }}
+        {% endif %}
+        – Statut : {{ t.get_status_display }}
+        <br>
+        Départ : ({{ t.latitude_depart }}, {{ t.longitude_depart }})
+        <br>
+        Destination : {{ t.lieu_arrivee }}
+        <br>
+        Commentaire : {{ t.commentaire|default:"—" }}
+        <!-- Afficher correspondances possibles pour ce trajet -->
+        {% if matches %}
+          {% for partenaire in matches %}
+            {# On suppose matches est une liste d'instances Trajet partenaires #}
+            {% if partenaire %}
+            <strong>{{ t.user.first_name }} {{ t.user.last_name }}</strong>
+              <div style="margin-top: 0.5em; padding: 0.5em; border: 1px solid #ccc; border-radius: 4px;">
+                Correspondance possible avec trajet #{{ partenaire.id }} de {{ partenaire.user.first_name }} {{ partenaire.user.last_name }}:
+                <form method="post" action="{% url 'trajet:accepter_match' partenaire.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit">Accepter</button>
+                </form>
+                <form method="post" action="{% url 'trajet:decliner_match' partenaire.id %}" style="display:inline; margin-left: 0.5em;">
+                  {% csrf_token %}
+                  <button type="submit">Refuser</button>
+                </form>
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>Vous n’avez pas encore de trajet.</li>
+    {% endfor %}
+  </ul>
+
+  <hr style="margin: 2em 0;">
+
+  <h2>Notifications récentes</h2>
+  <ul>
+    {% for n in notifications %}
+      <li style="margin-bottom: 0.5em;">
+        {% if not n.is_read %}<strong>NOUVEAU :</strong>{% endif %}
+        {{ n.created_at|date:"Y-m-d H:i" }} – {{ n.message }}
+      </li>
+    {% empty %}
+      <li>Aucune notification.</li>
+    {% endfor %}
+  </ul>
+  <p><a href="{% url 'trajet:notifications_page' %}">Voir toutes les notifications</a></p>
+  
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    console.log("Dashboard JS initialisé");
+    const modeRadios = document.querySelectorAll('input[name="mode"]');
+    const fieldDate = document.getElementById('field-date');
+    const fieldHeure = document.getElementById('field-heure');
+    const mapContainer = document.getElementById('map-container');
+    const latInput = document.querySelector('input[name="latitude_depart"]');
+    const lngInput = document.querySelector('input[name="longitude_depart"]');
+
+    const defaultLat = 6.45;
+    const defaultLng = 2.42;
+
+    let map = null;
+    let marker = null;
+    let mapInitialized = false;
+
+
+  function toggleFields() {
+    const selected = document.querySelector('input[name="mode"]:checked');
+    if (!selected) {
+      console.log("Aucun mode sélectionné");
+      // Masquer tout si rien n'est sélectionné
+      mapContainer.style.display = 'none';
+      fieldDate.style.display = 'none';
+      fieldHeure.style.display = 'none';
+      return;
+    }
+
+    const isPonctuel = selected.value === 'ponctuel';
+    console.log("Mode sélectionné:", selected.value);
+    mapContainer.style.display = isPonctuel ? 'block' : 'none';
+    fieldDate.style.display = isPonctuel ? '' : 'none';
+    fieldHeure.style.display = isPonctuel ? '' : 'none';
+
+    if (!isPonctuel) {
+      latInput.value = '';
+      lngInput.value = '';
+    }
+
+    // Initialiser la carte uniquement une fois
+    if (isPonctuel && !mapInitialized) {
+      map = L.map('map').setView([defaultLat, defaultLng], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+      map.on('click', function(e){
+        if (marker) map.removeLayer(marker);
+        marker = L.marker(e.latlng).addTo(map);
+        latInput.value = e.latlng.lat;
+        lngInput.value = e.latlng.lng;
+      });
+      mapInitialized = true;
+    }
+  }
+
+  modeRadios.forEach(radio => {
+    radio.addEventListener('change', toggleFields);
+  });
+
+  // Appelle toggleFields APRÈS que le DOM soit prêt et que les radios soient rendus
+  setTimeout(toggleFields, 0);
+});
+</script>
+
+{% endblock %}

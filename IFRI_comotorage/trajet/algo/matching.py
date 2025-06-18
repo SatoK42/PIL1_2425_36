@@ -29,30 +29,38 @@ def score_match(d, p):
     return sc
 
 def gale_shapley(drivers, passengers):
-    names_d = [d["nom"] for d in drivers]
-    names_p = [p["nom"] for p in passengers]
-    # Préférences construits dynamiquement
+    # on suppose chaque dict a 'id'
+    names_d = [d["id"] for d in drivers]
+    names_p = [p["id"] for p in passengers]
+    # construire prefs_d: liste d’IDs triés par score
     prefs_d = {}
     for d in drivers:
-        prefs = [(p, score_match(d, p)) for p in passengers]
-        prefs = sorted([p for p, sc in prefs if sc], key=lambda x: score_match(d, x), reverse=True)
-        prefs_d[d["nom"]] = [p["nom"] for p in prefs]
+        prefs = []
+        for p in passengers:
+            sc = score_match(d, p)
+            if sc is not None:
+                prefs.append((p, sc))
+        prefs.sort(key=lambda x: x[1], reverse=True)
+        prefs_d[d["id"]] = [p["id"] for p, _ in prefs]
     prefs_p = {}
     for p in passengers:
-        prefs = [(d, score_match(d, p)) for d in drivers]
-        prefs = sorted([d for d, sc in prefs if sc], key=lambda x: score_match(x, p), reverse=True)
-        prefs_p[p["nom"]] = [d["nom"] for d in prefs]
-
+        prefs = []
+        for d in drivers:
+            sc = score_match(d, p)
+            if sc is not None:
+                prefs.append((d, sc))
+        prefs.sort(key=lambda x: x[1], reverse=True)
+        prefs_p[p["id"]] = [d["id"] for d, _ in prefs]
     free = names_d[:]
     engaged = {}
     next_prop = {m: 0 for m in names_d}
-
     while free:
         m = free.pop(0)
-        if next_prop[m] >= len(prefs_d[m]): continue
+        if next_prop[m] >= len(prefs_d[m]):
+            continue
         w = prefs_d[m][next_prop[m]]
         next_prop[m] += 1
-        current = next((x for x, y in engaged.items() if y == w), None)
+        current = next((x for x,y in engaged.items() if y == w), None)
         if current is None:
             engaged[m] = w
         else:

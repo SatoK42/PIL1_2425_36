@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>Ride4UAC - Messagerie</title>
+<style>
+  body, html { margin:0; height:100%; font-family: Arial, sans-serif; }
+  .container { display: flex; height: 100vh; }
+  .sidebar {
+    width: 350px; background: #f8f9fa; border-right: 1px solid #ddd;
+    overflow-y: auto;
+  }
+  .conversation-item {
+    padding: 15px; border-bottom: 1px solid #ddd; cursor: pointer;
+  }
+  .conversation-item:hover, .conversation-item.active {
+    background-color: #d9ebff;
+  }
+  .conversation-name { font-weight: bold; font-size: 1.1em; }
+  .conversation-last-msg { color: #666; font-size: 0.9em; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .conversation-date { float: right; font-size: 0.8em; color: #999; }
+  
+  .chat-window {
+    flex: 1; display: flex; flex-direction: column; background: white;
+  }
+  .chat-header {
+    padding: 15px; border-bottom: 1px solid #ddd; font-weight: bold; font-size: 1.2em;
+  }
+  .chat-messages {
+    flex: 1; padding: 15px; overflow-y: auto; background: #e5ddd5;
+  }
+  .message {
+    margin-bottom: 10px; max-width: 60%;
+    padding: 8px 12px; border-radius: 10px; clear: both;
+  }
+  .message.self {
+    background-color: #dcf8c6; float: right;
+  }
+ .message.other {
+    background-color: white; float: left;
+  }
+  .message-author {
+    font-weight: bold; margin-bottom: 3px; font-size: 0.85em;
+  }
+  .chat-input {
+    border-top: 1px solid #ddd; padding: 10px; display: flex;
+  }
+  .chat-input textarea {
+    flex: 1; resize: none; padding: 10px; font-size: 1em;
+  }
+  .chat-input button {
+    margin-left: 10px; padding: 10px 20px; font-weight: bold; background: #0084ff; color: white; border: none; border-radius: 4px; cursor: pointer;
+  }
+  .chat-input button:hover {
+    background: #006bbf;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="sidebar">
+    {% for conv in conversations %}
+<div class="conversation-item {% if conv.id == active_conversation.id %}active{% endif %}" 
+           onclick="window.location.href='{% url 'messaging:conversation_detail' conv.id %}'">
+        <span class="conversation-name">
+          {% if conv.is_group %}{{ conv.name }}{% else %}
+            {% for u in conv.participants.all %}
+              {% if u != request.user %}{{ u.get_full_name|default:u.username }}{% endif %}
+            {% endfor %}
+          {% endif %}
+        </span>
+        <span class="conversation-date">
+          {{ conv.latest_message.timestamp|date:"d/m H:i" }}
+        </span>
+        <div class="conversation-last-msg">
+          {{ conv.latest_message.text|truncatechars:40 }}
+        </div>
+      </div>
+    {% empty %}
+      <p>Aucune conversation</p>
+    {% endfor %}
+  </div>
+<div class="chat-window">
+    <div class="chat-header">
+      {% if active_conversation.is_group %}
+        {{ active_conversation.name }}
+      {% else %}
+        {% for u in active_conversation.participants.all %}
+          {% if u != request.user %}{{ u.get_full_name|default:u.username }}{% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      {% for msg in messages %}   
+
+<div class="message {% if msg.sender == request.user %}self{% else %}other{% endif %}">
+          <div class="message-author">{{ msg.sender.get_full_name|default:msg.sender.username }}</div>
+          <div class="message-text">{{ msg.text }}</div>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="chat-input">
+      <textarea id="chat-message-input" rows="2" placeholder="Écrire un message..."></textarea>
+      <button id="chat-message-submit">Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const convoId = {{ active_conversation.id }};
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  const chatSocket = new WebSocket(wsProtocol://{window.location.host}/ws/chat/${convoId}/);
+
+  chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    const messagesDiv = document.getElementById('chat-messages');
+
+    const div = document.createElement('div');
+    div.className = 'message ' + (data.author === "{{ request.user.username }}" ? 'self' : 'other');
+
+    const authorDiv = document.createElement('div');
+    authorDiv.className = 'message-author';
+    authorDiv.textContent = data.author;
+
+    const textDiv = document.createElement('div');
+    textDiv.className = 'message-text';
+    textDiv.textContent = data.message;
+
+div.appendChild(authorDiv);
+    div.appendChild(textDiv);
+
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  };
+
+  document.getElementById('chat-message-submit').onclick = function() {
+    const input = document.getElementById('chat-message-input');
+    const message = input.value.trim();
+    if (!message) return;
+    chatSocket.send(JSON.stringify({
+      'message': message,
+    }));
+    input.value = '';
+  };
+
+  // Scroll to bottom on page load
+  window.onload = () => {
+    const messagesDiv = document.getElementById('chat-messages');
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  };
+</script>
+
+</body>
+</html>

@@ -176,17 +176,18 @@ fieldset {
     top: 10%;
     right: 2%;
 }
+#map { height: 400px; margin-top: 1em; }
 .dropdown-item{
     margin-bottom: 6px;
 }
 @media screen and (min-width:768px) {
-            .mobile{display: none;}
+            .mobil{display: none;}
     }
 @media screen and (max-width: 768px) {
-       .container-md{width: 100%;}
-       .bar{display: none;}
+       .container-md{width: 100%;margin-inline: 0;}
+       .bare{display: none;}
     }
-
+.map-container{z-index: 10; position: relative;}
 
     /*La feuille de style pour le bas de page*/
 .bas_de_page{
@@ -198,6 +199,7 @@ fieldset {
     z-index: 100;
     background: #a7a7a7;
     z-index: 100;
+    position: fixed;
 }
 
 .nav_items{

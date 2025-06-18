@@ -1,0 +1,21 @@
+{% extends 'auth_app/connected.html' %}
+{% block content %}
+  <h1>Notifications</h1>
+  <ul>
+    {% for n in notifications %}
+      <li>
+        {% if not n.is_read %}<strong>NOUVEAU :</strong>{% endif %}
+        {{ n.created_at|date:"Y-m-d H:i" }} – {{ n.message }}
+        {% if not n.is_read %}
+          <!-- Vous pouvez ajouter un bouton pour marquer comme lu via AJAX ou un lien vers une vue -->
+          <form method="post" action="{% url 'trajet:marquer_lu' n.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Marquer comme lu</button>
+          </form>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>Aucune notification.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

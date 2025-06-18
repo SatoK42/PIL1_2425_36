@@ -52,3 +52,4 @@ def acceuil(request):
 def logout(request):
     django_logout(request)
     return HttpResponseRedirect('/auth/login/')
+

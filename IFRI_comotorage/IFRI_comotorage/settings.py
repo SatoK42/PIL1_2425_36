@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'auth_app',
     'messaging_app',
-    'trajet.apps.TrajetConfig',
+    'trajet',
     'channels',
     'profileUser.apps.ProfileuserConfig',
 ]
@@ -139,6 +139,10 @@ AUTHENTICATION_BACKENDS = [
 
 AUTH_USER_MODEL = 'auth_app.Users'
 
+IFRI_UAC_NAME = "IFRI UAC"
+
+IFRI_UAC_LONGITUDE = 6.416676
+IFRI_UAC_LATITUDE = 2.340447
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
