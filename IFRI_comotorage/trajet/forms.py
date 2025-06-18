@@ -10,17 +10,17 @@ class TrajetForm(forms.ModelForm):
     mode = forms.ChoiceField(choices=MODE_CHOICES, widget=forms.RadioSelect)
     date = forms.DateField(
         required=False,
-        widget=forms.DateInput(attrs={'type': 'date'}),
+        widget=forms.DateInput(attrs={'type': 'date','class': 'form-control'}),
         help_text="Date du trajet (obligatoire pour trajet ponctuel)."
     )
     heure = forms.TimeField(
         required=False,
-        widget=forms.TimeInput(attrs={'type': 'time'}),
+        widget=forms.TimeInput(attrs={'type': 'time','class': 'form-control'}),
         help_text="Heure de départ (obligatoire pour trajet ponctuel)."
     )
     latitude_depart = forms.FloatField(widget=forms.HiddenInput(), required=False)
     longitude_depart = forms.FloatField(widget=forms.HiddenInput(), required=False)
-    commentaire = forms.CharField(widget=forms.Textarea, required=False)
+    commentaire = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), required=False)
 
     class Meta:
         model = Trajet

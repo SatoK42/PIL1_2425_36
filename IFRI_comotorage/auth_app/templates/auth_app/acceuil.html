@@ -137,4 +137,80 @@
     </div>
   </section>
 </div>
+{% if require_vehicle_info %}
+  <!-- Modal Bootstrap 5 -->
+  <div class="modal fade shadow rounded form" id="vehicleModal" tabindex="-1" aria-labelledby="vehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content ">
+        <form id="vehicle-form" method="post" action="{% url 'profileUser:profile_update_vehicle' %}">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="vehicleModalLabel">Complétez vos infos véhicule</h5>
+          </div>
+          <div class="modal-body">
+            <p>Pour continuer, merci de renseigner les informations sur votre véhicule :</p>
+            {% if vehicle_form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ vehicle_form.non_field_errors }}
+              </div>
+            {% endif %}
+            <div class="mb-3">
+              {{ vehicle_form.vehicle_type.label_tag }}
+              {{ vehicle_form.vehicle_type }}
+              {% for e in vehicle_form.vehicle_type.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ vehicle_form.seats.label_tag }}
+              {{ vehicle_form.seats }}
+              {% for e in vehicle_form.seats.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ vehicle_form.brand.label_tag }}
+              {{ vehicle_form.brand }}
+              {% for e in vehicle_form.brand.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ vehicle_form.model.label_tag }}
+              {{ vehicle_form.model }}
+              {% for e in vehicle_form.model.errors %}
+                <div class="text-danger small">{{ e }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          <input type="hidden" name="is_driver" value="True">
+          <div class="mb-3">
+            <label for="habitual_time" class="form-label form-control">Heure habituelle de départ</label>
+            <input type="time" class="form-control" id="habitual_time" name="habitual_time" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Point de départ habituel</label>
+            <div id="map-modal" style="height: 250px; border-radius: 8px;"></div>
+            <input type="hidden" name="habitual_lat" id="habitual_lat">
+            <input type="hidden" name="habitual_lng" id="habitual_lng">
+            <small class="text-muted">Cliquez sur la carte pour choisir votre point de départ habituel.</small>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Script pour afficher le modal bloquant -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      var vehicleModal = new bootstrap.Modal(document.getElementById('vehicleModal'), {
+        backdrop: 'static',
+        keyboard: false
+      });
+      vehicleModal.show();
+    });
+  </script>
+{% endif %}
 {% endblock %}

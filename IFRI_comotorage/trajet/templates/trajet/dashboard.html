@@ -9,96 +9,118 @@
       <div class="alert alert-danger">{{ field.label }}: {{ err }}</div>
     {% endfor %}
   {% endfor %}
-  <h2>Publier un trajet</h2>
-  <form method="post" id="trajet-form">{% csrf_token %}
-    <div>
-      {{ form.mode.label_tag }}
-      {{ form.mode }}
+  <div class="card mb-5">
+    <div class="card-header">
+      <h2>Publier un trajet</h2>
     </div>
+    <div class="card-body">
+      <form method="post" id="trajet-form">{% csrf_token %}
+        <div>
+          {{ form.mode.label_tag }}
+          {{ form.mode }}
+        </div>
 
-    <!-- Champs pour trajet ponctuel : date et heure -->
-    <div id="field-date" style="display: none; margin-top: 0.5em;">
-      {{ form.date.label_tag }} {{ form.date }}
+        <!-- Champs pour trajet ponctuel : date et heure -->
+        <div class="d-flex justify-content-around align-items-center" style="margin-top: 0.5em;">
+          <div id="field-date" style="display: none; margin-top: 0.5em;width: 45%;">
+            {{ form.date.label_tag }} {{ form.date }}
+          </div>
+          <div id="field-heure" style="display: none; margin-top: 0.5em; width: 45%;">
+            {{ form.heure.label_tag }} {{ form.heure }}
+          </div>
+        </div>
+
+        <!-- Carte Leaflet pour définir point de départ ponctuel -->
+        <div id="map-container" style="display: none; margin-top: 0.5em;">
+          <label>Choisissez le point de départ :</label>
+          <div id="map" style="height: 300px; margin-top: 0.5em;"></div>
+          {{ form.latitude_depart }} {{ form.longitude_depart }}
+        </div>
+
+        <!-- Commentaire toujours visible -->
+        <div style="margin-top: 0.5em;">
+          {{ form.commentaire.label_tag }}
+          {{ form.commentaire }}
+        </div>
+
+        <button type="submit" style="margin-top: 1em;margin-inline: auto;" class="btn bg-g">Publier</button>
+      </form>
+
     </div>
-    <div id="field-heure" style="display: none; margin-top: 0.5em;">
-      {{ form.heure.label_tag }} {{ form.heure }}
+  </div>
+  
+  <hr style="margin: 2em 0;height: 3px;">
+
+  <div class="card mb-5">
+    <div class="card-header bg-g">
+      <h2 class="text-center col-wh">Mes trajets</h2>
     </div>
-
-    <!-- Carte Leaflet pour définir point de départ ponctuel -->
-    <div id="map-container" style="display: none; margin-top: 0.5em;">
-      <label>Choisissez le point de départ :</label>
-      <div id="map" style="height: 300px; margin-top: 0.5em;"></div>
-      {{ form.latitude_depart }} {{ form.longitude_depart }}
-    </div>
-
-    <!-- Commentaire toujours visible -->
-    <div style="margin-top: 0.5em;">
-      {{ form.commentaire.label_tag }}
-      {{ form.commentaire }}
-    </div>
-
-    <button type="submit" style="margin-top: 1em;">Publier</button>
-  </form>
-
-  <hr style="margin: 2em 0;">
-
-  <h2>Mes trajets</h2>
-  <ul>
-    {% for t in trajets %}
-      <li style="margin-bottom: 1em;">
-        <strong>#{{ t.id }}</strong> –
-        {% if t.recurring %}
-          Trajet quotidien à {{ t.heure }}
-        {% else %}
-          Le {{ t.date }} à {{ t.heure }}
-        {% endif %}
-        – Statut : {{ t.get_status_display }}
-        <br>
-        Départ : ({{ t.latitude_depart }}, {{ t.longitude_depart }})
-        <br>
-        Destination : {{ t.lieu_arrivee }}
-        <br>
-        Commentaire : {{ t.commentaire|default:"—" }}
-        <!-- Afficher correspondances possibles pour ce trajet -->
-        {% if matches %}
-          {% for partenaire in matches %}
-            {# On suppose matches est une liste d'instances Trajet partenaires #}
-            {% if partenaire %}
-            <strong>{{ t.user.first_name }} {{ t.user.last_name }}</strong>
-              <div style="margin-top: 0.5em; padding: 0.5em; border: 1px solid #ccc; border-radius: 4px;">
-                Correspondance possible avec trajet #{{ partenaire.id }} de {{ partenaire.user.first_name }} {{ partenaire.user.last_name }}:
-                <form method="post" action="{% url 'trajet:accepter_match' partenaire.id %}" style="display:inline;">
-                  {% csrf_token %}
-                  <button type="submit">Accepter</button>
-                </form>
-                <form method="post" action="{% url 'trajet:decliner_match' partenaire.id %}" style="display:inline; margin-left: 0.5em;">
-                  {% csrf_token %}
-                  <button type="submit">Refuser</button>
-                </form>
-              </div>
+    <div class="card-body">
+      <ul>
+        {% for t in trajets %}
+          <li class="bg-whk rounded p-3" style="margin-bottom: 1em;">
+            <strong>#{{ t.id }}</strong> –
+            {% if t.recurring %}
+              Trajet quotidien à {{ t.heure }}
+            {% else %}
+              Le {{ t.date }} à {{ t.heure }}
             {% endif %}
-          {% endfor %}
-        {% endif %}
-      </li>
-    {% empty %}
-      <li>Vous n’avez pas encore de trajet.</li>
-    {% endfor %}
-  </ul>
+            – Statut : {{ t.get_status_display }}
+            <br>
+            Départ : ({{ t.latitude_depart }}, {{ t.longitude_depart }})
+            <br>
+            Destination : {{ t.lieu_arrivee }}
+            <br>
+            Commentaire : {{ t.commentaire|default:"—" }}
+            <!-- Afficher correspondances possibles pour ce trajet -->
+            {% if matches %}
+              {% for partenaire in matches %}
+                {# On suppose matches est une liste d'instances Trajet partenaires #}
+                {% if partenaire %}
+                <strong>{{ t.user.first_name }} {{ t.user.last_name }}</strong>
+                  <div style="margin-top: 0.5em; padding: 0.5em; border: 1px solid #ccc; border-radius: 4px;">
+                    Correspondance possible avec trajet #{{ partenaire.id }} de {{ partenaire.user.first_name }} {{ partenaire.user.last_name }}:
+                    <form method="post" action="{% url 'trajet:accepter_match' partenaire.id %}" style="display:inline;">
+                      {% csrf_token %}
+                      <button type="submit " class="btn bg-g col-wh">Accepter</button>
+                    </form>
+                    <form method="post" action="{% url 'trajet:decliner_match' partenaire.id %}" style="display:inline; margin-left: 0.5em;">
+                      {% csrf_token %}
+                      <button type="submit" class="btn bg-g col-wh">Refuser</button>
+                    </form>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </li>
+        {% empty %}
+          <li class="bg-whk p-3 rounded">Vous n’avez pas encore de trajet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 
-  <hr style="margin: 2em 0;">
+  <hr style="margin: 2em 0;height: 3px;">
 
-  <h2>Notifications récentes</h2>
-  <ul>
-    {% for n in notifications %}
-      <li style="margin-bottom: 0.5em;">
-        {% if not n.is_read %}<strong>NOUVEAU :</strong>{% endif %}
-        {{ n.created_at|date:"Y-m-d H:i" }} – {{ n.message }}
-      </li>
-    {% empty %}
-      <li>Aucune notification.</li>
-    {% endfor %}
-  </ul>
-  <p><a href="{% url 'trajet:notifications_page' %}">Voir toutes les notifications</a></p>
+  <div class="card mb-5">
+    <div class="card-header bg-g">
+      <h2 class="text-center col-wh">Mes correspondances</h2>
+    </div>
+    <div class="card-body">
+      <ul>
+        {% for n in notifications %}
+          <li class="bg-whk p-3 rounded" style="margin-bottom: 0.5em;">
+            {% if not n.is_read %}<strong>NOUVEAU :</strong>{% endif %}
+            {{ n.created_at|date:"Y-m-d H:i" }} – {{ n.message }}
+          </li>
+        {% empty %}
+          <li class="bg-whk p-3 rounded text-center">Aucune notification.</li>
+        {% endfor %}
+      </ul>
+     <p class="text-center"><a href="{% url 'trajet:notifications_page' %}">Voir toutes les notifications</a></p>
+    </div>
+  </div>
+  
   
 <script>
   document.addEventListener('DOMContentLoaded', function(){
