@@ -1,0 +1,15 @@
+{% extends "auth_app/log.html" %}
+
+
+{% block title %}Réinitialisation du mot de passe{% endblock %}
+
+{% block content %}
+<h2>Réinitialisation du mot de passe</h2>
+<form method="POST">
+    {% csrf_token %}
+    <label>Email ou numéro de téléphone :</label><br>
+    <input type="text" name="identifiant" required><br><br>
+    <button type="submit">Continuer</button>
+</form>
+<p style="color:red;">{{ message }}</p>
+{% endblock %}

@@ -1,4 +1,4 @@
-{% extends "auth_app/log.html" %}
+{% extends 'auth_app/log.html' %}
 
 {% block title %}Register{% endblock %}
 
@@ -22,6 +22,7 @@
                 <button type="submit" class="btn bg-g mt-2 mb-3 col-wh">Se connecter</button>
             </form>
             <p class="text-center">Vous n’êtes pas encore inscrit? <a href="{% url 'register' %}">S'inscrire</a></p>
+            <p class="text-center">Mot de passe oublié? <a href="{% url 'reinitialiser' %}">Réinitialiser</a></p>
         </div>
         <div class="container mt-5"><hr></div>
         <p class="text-center">© 2025 PANTAGONE</p>

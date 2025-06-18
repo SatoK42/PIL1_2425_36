@@ -11,7 +11,7 @@
         <div class="card-body">
           <div class="d-flex align-items-center mb-4">
             {% if profile.photo %}
-              <img src="{{ profile.photo.url }}" alt="Photo de profil" class="rounded-circle" style="width:100px; height:100px; object-fit:cover;">
+              <img src="{{ profile.photo.url }}" alt="Photo de profil" class="rounded-circle" style="width:100px; height:100px; object-fit:cover; cursor: zoom-in;" onclick="agrandir(this.src)";>
             {% else %}
               <img src="{% static 'img/default_avatar.png' %}" alt="Avatar par défaut" class="rounded-circle" style="width:100px; height:100px; object-fit:cover;">
             {% endif %}
@@ -83,4 +83,18 @@
     });
   </script>
 {% endif %}
+
+<div id="popup-photo" onclick="fermerModale()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); z-index: 9999; justify-content: center; align-items: center;"> 
+  <img id="image-grande" src="" alt="Image agrandie" style="width: auto; height: 85vh; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);"> 
+</div>
+<script> function agrandir(src) { 
+  const image = document.getElementById("image-grande"); 
+  image.src = src; 
+  document.getElementById("popup-photo").style.display = "flex"; 
+} 
+function fermerModale() { 
+  document.getElementById("popup-photo").style.display = "none"; 
+  document.getElementById("image-grande").src = ""; 
+} 
+</script>
 {% endblock %}
