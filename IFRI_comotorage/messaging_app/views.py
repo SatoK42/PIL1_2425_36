@@ -74,7 +74,7 @@ def conversation_detail(request, convo_id):
     convo = get_object_or_404(Conversation, id=convo_id, participants=request.user)
     messages = Message.objects.filter(conversation=convo).order_by('timestamp')
     return render(request, 'messaging_app/conversation_detail.html', {
-        'conversation': convo,
+        'active_conversation': convo,
         'messages': messages
     })
 
@@ -84,6 +84,21 @@ def new_conversation(request):
         form = NewConversationForm(request.POST)
         participants_ids = request.POST.getlist('participants')
         if form.is_valid():
+            # Si c'est une conversation privée (non-groupe), vérifier si elle existe déjà
+            if not form.cleaned_data['is_group'] and len(participants_ids) == 1:
+                # Chercher une conversation privée existante entre les 2 participants
+                existing_convo = Conversation.objects.filter(
+                    is_group=False,
+                    participants=request.user
+                ).filter(
+                    participants__id=participants_ids[0]
+                ).first()
+                
+                if existing_convo:
+                    # Rediriger vers la conversation existante
+                    return redirect('messaging:conversation_main', convo_id=existing_convo.id)
+            
+            # Sinon, créer une nouvelle conversation
             convo = form.save(commit=False)
             convo.created_by = request.user
             convo.save()
@@ -92,7 +107,7 @@ def new_conversation(request):
             convo.participants.add(request.user, *participants_ids)
 
             # Enfin on redirige VRAIMENT vers la room
-            return redirect('messaging:conversation_detail', convo_id=convo.id)
+            return redirect('messaging:conversation_main', convo_id=convo.id)
     else:
         form = NewConversationForm()
 
