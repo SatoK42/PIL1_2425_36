@@ -24,7 +24,7 @@ body.container-md {
   </div>
   <div class="chat-window">
     {% if active_conversation %}
-      {% include 'messaging_app/conversation_detail.html' %}
+      {% include 'messaging_app/conversation_detail.html' with active_conversation=active_conversation %}
     {% else %}
       <div class="text-center m-4 text-muted">
         <p>Sélectionnez une conversation à gauche</p>
