@@ -53,8 +53,7 @@ def logout(request):
     django_logout(request)
     return HttpResponseRedirect('/auth/login/')
 
-<<<<<<< HEAD
-=======
+
 def verification_utilisateur(request):
     message = ""
     if request.method == "POST":
@@ -100,5 +99,3 @@ def changer_mdp(request, utilisateur_id):
 
 
 
-
->>>>>>> f96fa43a089edd85c36a36627011e7b7386ddc87
