@@ -55,6 +55,7 @@ def logout(request):
 
 <<<<<<< HEAD
 =======
+
 def verification_utilisateur(request):
     message = ""
     if request.method == "POST":
