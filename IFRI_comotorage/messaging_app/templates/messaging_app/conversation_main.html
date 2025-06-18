@@ -2,20 +2,7 @@
 {% extends 'auth_app/connected.html' %}
 
 {% block content %}
-<style>
-/* Annuler la contrainte du container-md pour la messagerie */
-body.container-md {
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
 
-/* Ajuster la hauteur pour tenir compte de la navbar */
-.messaging-container {
-    height: calc(100vh - 120px) !important;
-    margin-top: 0 !important;
-}
-</style>
 
 <div class="messaging-container">
   <div class="sidebar">

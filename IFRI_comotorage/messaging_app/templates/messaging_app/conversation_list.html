@@ -2,22 +2,23 @@
 {% if conversations %}
   <ul class="conversation-list">
     {% for c in conversations %}
-      <li class="conversation-item{% if c.id == active_conversation_id %} active{% endif %}">
-        <a href="{% url 'messaging:conversation_main' c.id %}">
-          <span class="conversation-name">
-            {% if c.is_group %}{{ c.name }}
-            {% else %}
-              {% for u in c.participants.all %}
-                {% if u != request.user %}{{ u.get_full_name|default:u.email }}{% endif %}
-              {% endfor %}
-            {% endif %}
-          </span>
-          <span class="conversation-date float-end">{{ c.last_msg|date:"d/m H:i" }}</span>
-        </a>
-      </li>
+      <a href="{% url 'messaging:conversation_main' c.id %}">
+          <li class="conversation-item{% if c.id == active_conversation_id %} active{% endif %}">
+            <span class="conversation-name">
+              {% if c.is_group %}{{ c.name }}
+              {% else %}
+                {% for u in c.participants.all %}
+                  {% if u != request.user %}{{ u.get_full_name|default:u.email }}{% endif %}
+                {% endfor %}
+              {% endif %}
+            </span>
+            <span class="conversation-date float-end">{{ c.last_msg|date:"d/m H:i" }}</span>
+          </li>
+      </a>
+      
     {% endfor %}
   </ul>
 {% else %}
   <p>Aucune conversation pour l'instant. </p>
 {% endif %}
-<a href="{% url 'messaging:new_conversation' %}" class="btn btn-success w-100 mt-3">Nouveau chat</a>
+<a href="{% url 'messaging:new_conversation' %}" class="btn btn-success w-100 mt-3 bg-g col-wh">Nouveau chat</a>

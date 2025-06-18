@@ -32,7 +32,7 @@
 .sidebar-title {
     padding: 20px;
     margin: 0;
-    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    background: #4dd5dc;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     font-size: 1.2em;
     font-weight: 700;
@@ -61,7 +61,7 @@
 }
 
 .conversation-item.active {
-    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    background:#4dd5dc;
     color: white;
     border-left: 4px solid #fff;
     padding-left: 16px;
@@ -102,7 +102,7 @@
 
 .chat-header {
     padding: 20px;
-    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    background: #4dd5dc;
     color: white;
     font-weight: 600;
     font-size: 1.1em;
@@ -167,7 +167,7 @@
 }
 
 .message.self {
-    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    background: #667eea;
     color: white;
     border-radius: 18px;
     border-bottom-right-radius: 4px;
@@ -266,7 +266,7 @@
 
 .chat-input button {
     padding: 12px 24px;
-    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    background: #4dd5dc;
     color: white;
     border: none;
     border-radius: 25px;
