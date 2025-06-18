@@ -80,19 +80,15 @@
                 <span class="dropdown">
                     <a href="" class="menu btn" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="white" d="M2 4h20v2H2zm0 7h20v2H2zm1 7H2v2h20v-2z"/></svg></a>
                     <ul class="dropdown-menu mt-3" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" href="#">Acceuil</a></li>
+                        <li><a class="dropdown-item" href="{% url 'acceuil' %}">Acceuil</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Message</a></li>
+                        <li><a class="dropdown-item" href="{% url 'messaging:main' %}">Message</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'profileUser:profile' %}">Profile</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Notifications</a></li>
+                        <li><a class="dropdown-item" href="{% url 'trajet:notifications_page' %}">Notifications</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Paramètres</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">A propos</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Contacts</a></li>
+                        <li><a class="dropdown-item" href="#how">Comment ça marche?</a></li>
                     </ul>
                 </span>
             </div>
@@ -110,6 +106,10 @@
         {% block content %}{% endblock %}
         
     </div>
+
+    <div class="container-md bare">
+        <div class="container mt-5"><hr></div>
+        <p class="text-center">© 2025 PIL_2425_36 | IFRI</p>
     <div class="container-md mobil">
         <div class="bas_de_page">
             <div class="nav_items">

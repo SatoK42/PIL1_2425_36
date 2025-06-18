@@ -183,6 +183,13 @@ nav {
     height: 100px;
     width: 100px;
 }
+.mobile-bar{
+    display: none;
+    display: flex;
+    gap: 0.5em;
+    justify-content: center;
+    align-items: center;
+}
 fieldset {
   all: revert;
   border: 1px solid #ccc;
