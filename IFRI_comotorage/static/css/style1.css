@@ -221,9 +221,15 @@ fieldset {
     right: 0;
     bottom: 0;
     z-index: 100;
-    background: #a7a7a7;
+    background: #f1f1f1;
     z-index: 100;
     position: fixed;
+    padding: 0.4em 0.2em;
+}
+
+.bas_de_page a{
+    color: #4DD5DC;
+    
 }
 
 .nav_items{
