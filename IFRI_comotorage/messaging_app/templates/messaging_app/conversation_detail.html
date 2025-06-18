@@ -1,34 +1,39 @@
-{% extends 'auth_app/connected.html' %}
-{% block content %}
 <div 
-  x-data="chatRoom({{ conversation.id }}, '{{ room_title|escapejs }}')" x-init="init()"
-  class="p-4"
+  x-data="chatRoom({{ active_conversation.id }}, '{{ active_conversation.name|default:"Conversation" }}', '{{ request.user.username|default:request.user.email|escapejs }}', '{{ request.user.get_full_name|default:request.user.email|escapejs }}')" x-init="init()" class="chat-window"
 >
-  <h2 x-text="title"></h2>
-  <div id="messages" class="mb-3" x-ref="msgs" style="max-height:400px; overflow-y:auto">
+  <div class="chat-header">
+    <button class="btn btn-sm btn-outline-light d-md-none me-2" onclick="showSidebar()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+      </svg>
+    </button>
+    <span x-text="title"></span>
+  </div>
+
+  <div id="messages" class="chat-messages mb-3" x-ref="msgs">
     <template x-for="m in messages" :key="m.id">
-      <p><strong x-text="m.sender"></strong>: <span x-text="m.text"></span></p>
+      <div :class="(m.sender === currentUser || (m.sender === null && m.sender_display === currentUserFullName)) ? 'message self' : 'message other'">
+        <div class="message-author" x-text="m.sender_display || m.sender"></div>
+        <div x-text="m.text"></div>
+        <div class="message-time" x-text="(new Date(m.timestamp)).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})"></div>
+      </div>
     </template>
   </div>
 
-  <textarea 
-    x-ref="input" 
-    x-model="draft" 
-    rows="2" 
-    class="form-control" 
-    placeholder="Écrire un message..."
-  ></textarea>
-  <button 
-    @click="send()" 
-    class="btn btn-primary mt-2"
-  >Envoyer</button>
+  <div class="chat-input mt-auto">
+    <textarea x-ref="input" x-model="draft" rows="2" class="form-control" placeholder="Écrire un message…"></textarea>
+    <button @click="send()" class="btn btn-primary">Envoyer</button>
+  </div>
 </div>
 
+
 <script>
-function chatRoom(convoId, roomTitle) {
-  return {
-    convoId,
-    title: roomTitle,
+function chatRoom(convoId, roomTitle, userName, userFullName) { 
+  return { 
+    convoId, 
+    title: roomTitle, 
+    currentUser: userName,
+    currentUserFullName: userFullName,
     messages: [],
     draft: '',
     socket: null,
@@ -49,8 +54,7 @@ function chatRoom(convoId, roomTitle) {
 
       this.socket.addEventListener('message', e => {
         const newMsg = JSON.parse(e.data);
-        console.log("Frame WS reçu :", newMsg);
-        // ← Filtrer les doublons d’ID
+        // ← Filtrer les doublons d'ID
         if (!this.messages.find(m => m.id === newMsg.id)) {
           this.messages.push(newMsg);
           this.sortMessages();
@@ -75,4 +79,4 @@ function chatRoom(convoId, roomTitle) {
   }
 }
 </script>
-{% endblock %}
+
