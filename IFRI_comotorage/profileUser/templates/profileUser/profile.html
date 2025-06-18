@@ -1,53 +1,79 @@
 {% extends 'auth_app/connected.html' %}
 {% load static %}
 {% block content %}
-<div class="container py-4 mt-4">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card shadow-sm">
-        <div class="card-header bg-whk">
-          <h3 class="mb-0">Mon profil</h3>
-        </div>
-        <div class="card-body">
-          <div class="d-flex align-items-center mb-4">
-            {% if profile.photo %}
-              <img src="{{ profile.photo.url }}" alt="Photo de profil" class="rounded-circle" style="width:100px; height:100px; object-fit:cover; cursor: zoom-in;" onclick="agrandir(this.src)";>
-            {% else %}
-              <img src="{% static 'img/default_avatar.png' %}" alt="Avatar par défaut" class="rounded-circle" style="width:100px; height:100px; object-fit:cover;">
-            {% endif %}
-            <div class="ms-3">
-              <h4>{{ request.user.get_full_name|default:request.user.username }}</h4>
-              <p class="text-muted">{{ request.user.email }}</p>
-            </div>
+<div class="profile-container">
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="profile-card">
+          <div class="profile-header">
+            <h3>Mon profil</h3>
           </div>
-          <ul class="list-group list-group-flush">
-            {% if profile.is_driver %}
-              <li class="list-group-item"><strong>Conducteur :</strong> Oui</li>
-              <li class="list-group-item"><strong>Type de véhicule :</strong> {{ profile.get_vehicle_type_display }}</li>
-              <li class="list-group-item"><strong>Nombre de places :</strong> {{ profile.seats }}</li>
-              {% if profile.brand %}
-                <li class="list-group-item"><strong>Marque :</strong> {{ profile.brand }}</li>
+          <div class="profile-body">
+            <div class="profile-avatar-section">
+              {% if profile.photo %}
+                <img src="{{ profile.photo.url }}" alt="Photo de profil" class="profile-avatar" onclick="agrandir(this.src)" style="cursor: pointer;" title="Cliquez pour agrandir">
+              {% else %}
+                <img src="{% static 'img/default_avatar.png' %}" alt="Avatar par défaut" class="profile-avatar">
               {% endif %}
-              {% if profile.model %}
-                <li class="list-group-item"><strong>Modèle :</strong> {{ profile.model }}</li>
-              {% endif %}
-            {% else %}
-              <li class="list-group-item"><strong>Conducteur :</strong> Non</li>
-            {% endif %}
-
-            {% if profile.departure_time %}
-              <li class="list-group-item"><strong>Heure de départ habituelle :</strong> {{ profile.departure_time }}</li>
-            {% endif %}
-            {% if profile.departure_lat and profile.departure_lng %}
-              <li class="list-group-item">
-                <strong>Point de départ :</strong>
+              <div class="profile-info">
+                <h4>{{ request.user.get_full_name|default:request.user.username }}</h4>
+                <p>{{ request.user.email }}</p>
+              </div>
+            </div>
             
-                <div id="map-view" style="width:360px; height:120px; border:1px solid #ccc;"></div>
-              </li>
-            {% endif %}
-          </ul>
-          <div class="mt-4">
-            <a href="{% url 'profileUser:profile_edit' %}" class="btn bg-g col-wh">Modifier le profil</a>
+            <div class="profile-details">
+              {% if profile.is_driver %}
+                <div class="profile-detail-item">
+                  <span class="profile-detail-label">Conducteur</span>
+                  <span class="profile-detail-value">Oui</span>
+                </div>
+                <div class="profile-detail-item">
+                  <span class="profile-detail-label">Type de véhicule</span>
+                  <span class="profile-detail-value">{{ profile.get_vehicle_type_display }}</span>
+                </div>
+                <div class="profile-detail-item">
+                  <span class="profile-detail-label">Nombre de places</span>
+                  <span class="profile-detail-value">{{ profile.seats }}</span>
+                </div>
+                {% if profile.brand %}
+                  <div class="profile-detail-item">
+                    <span class="profile-detail-label">Marque</span>
+                    <span class="profile-detail-value">{{ profile.brand }}</span>
+                  </div>
+                {% endif %}
+                {% if profile.model %}
+                  <div class="profile-detail-item">
+                    <span class="profile-detail-label">Modèle</span>
+                    <span class="profile-detail-value">{{ profile.model }}</span>
+                  </div>
+                {% endif %}
+              {% else %}
+                <div class="profile-detail-item">
+                  <span class="profile-detail-label">Conducteur</span>
+                  <span class="profile-detail-value">Non</span>
+                </div>
+              {% endif %}
+
+              {% if profile.departure_time %}
+                <div class="profile-detail-item">
+                  <span class="profile-detail-label">Heure de départ habituelle</span>
+                  <span class="profile-detail-value">{{ profile.departure_time }}</span>
+                </div>
+              {% endif %}
+              {% if profile.departure_lat and profile.departure_lng %}
+                <div class="profile-detail-item">
+                  <span class="profile-detail-label">Point de départ</span>
+                  <div class="map-preview-container">
+                    <div id="map-view" class="map-preview" style="width:360px; height:120px;"></div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+            
+            <div class="profile-actions">
+              <a href="{% url 'profileUser:profile_edit' %}" class="btn btn-profile btn-edit">Modifier le profil</a>
+            </div>
           </div>
         </div>
       </div>
@@ -65,29 +91,23 @@
       const lng = parseFloat("{{ profile.departure_lng }}");
       const map = L.map('map-view', {
         center: [lat, lng],
-        zoom: 13,
-        /*attributionControl: false,
-        zoomControl: false,
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        boxZoom: false,
-        keyboard: false,
-        tap: false,
-        touchZoom: false*/
+        zoom: 13
       });
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: ''
+        attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
       L.marker([lat, lng]).addTo(map);
     });
   </script>
 {% endif %}
 
-<div id="popup-photo" onclick="fermerModale()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); z-index: 9999; justify-content: center; align-items: center;"> 
-  <img id="image-grande" src="" alt="Image agrandie" style="width: auto; height: 85vh; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);"> 
+<!-- Modal pour l'image agrandie -->
+<div id="popup-photo" class="photo-modal" onclick="fermerModale()"> 
+  <img id="image-grande" src="" alt="Image agrandie"> 
 </div>
-<script> function agrandir(src) { 
+
+<script> 
+function agrandir(src) { 
   const image = document.getElementById("image-grande"); 
   image.src = src; 
   document.getElementById("popup-photo").style.display = "flex"; 
