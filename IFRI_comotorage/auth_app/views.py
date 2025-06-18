@@ -7,6 +7,11 @@ from django.http import HttpResponseRedirect
 from .models import Users
 from django.contrib.auth.decorators import login_required
 from profileUser.forms import ProfileUpdateForm
+from profileUser.models import Profile
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password   
+
 def register(request):
     if request.method == 'POST':
         form = UserModelForm(request.POST)
@@ -90,13 +95,14 @@ def changer_mdp(request, utilisateur_id):
         mdp2 = request.POST.get("mdp2")
 
         if mdp1 == mdp2:
-            utilisateur.set_password(mdp1)  # ✅ Hachage correct
-            utilisateur.save()
-            return redirect('login')  # 🔁 Change selon le nom de ta page de login
+            try:
+                validate_password(mdp1, utilisateur)  # Validation Django
+                utilisateur.set_password(mdp1)
+                utilisateur.save()
+                return redirect('login')
+            except ValidationError as e:
+                message = "\n".join(e.messages)
         else:
             message = "Les mots de passe ne correspondent pas."
 
     return render(request, 'auth_app/changer_mdp.html', {"message": message})
-
-
-

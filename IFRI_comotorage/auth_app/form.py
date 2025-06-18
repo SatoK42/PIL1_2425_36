@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from phonenumbers import parse as pn_parse, is_valid_number, format_number, PhoneNumberFormat
 from phonenumbers.phonenumber import PhoneNumber as PNType
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
 
 
 from .models import Users
@@ -37,7 +38,11 @@ class UserModelForm(forms.ModelForm):
             'phone_number': forms.TextInput(attrs={'class':'form-control','id':'phone','placeholder':'Téléphone'}),
             'role': forms.Select(attrs={'class':'form-control'}),
         }
-
+    def clean_password1(self):
+        password = self.cleaned_data.get('password1')
+        validate_password(password)  # Utilise les validateurs de settings.py
+        return password
+    
     def clean_password2(self):
         p1 = self.cleaned_data.get("password1")
         p2 = self.cleaned_data.get("password2")

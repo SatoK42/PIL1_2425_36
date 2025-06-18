@@ -5,122 +5,127 @@
 
 {% block content %}
 <!-- Section Hero -->
-<section class="py-5 text-center bg-light">
-  <div class="container">
-    <h1 class="display-4">Bienvenue sur Ride4UAC</h1>
-    <p class="lead">Partagez vos trajets vers l’IFRI UAC facilement : conducteurs et passagers se rencontrent ici.</p>
-    {% if user.is_authenticated %}
-      <div class="d-flex justify-content-center gap-3">
-        <a href="{% url 'trajet:dashboard' %}" class="btn btn-primary btn-lg">Mon Dashboard</a>
-        <a href="{% url 'trajet:dashboard' %}?action=publish" class="btn btn-outline-primary btn-lg">Publier un trajet</a>
+<div class="container">
+  <section class="py-3 row d-flex px-3 shadow justify-content-center align-items-center">
+      <div class="logo col">
+        <img src="{% static 'img/logo_r.webp' %}" alt="logo">
       </div>
-    {% else %}
-      <div class="d-flex justify-content-center gap-3">
-        <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Se connecter</a>
-        <a href="{% url 'signup' %}" class="btn btn-outline-primary btn-lg">S’inscrire</a>
-      </div>
-    {% endif %}
-  </div>
-</section>
-
-<!-- Section Fonctionnalités -->
-<section class="py-5">
-  <div class="container">
-    <h2 class="mb-4 text-center">Comment ça marche ?</h2>
-    <div class="row gy-4">
-      <div class="col-md-4 text-center">
-        <img src="{% static 'img/icon-profile.svg' %}" alt="Profil" width="60" class="mb-3">
-        <h5>Créez votre profil</h5>
-        <p>Indiquez si vous êtes conducteur ou passager, et renseignez vos coordonnées habituelles.</p>
-      </div>
-      <div class="col-md-4 text-center">
-        <img src="{% static 'img/icon-publish.svg' %}" alt="Publier" width="60" class="mb-3">
-        <h5>Publiez un trajet</h5>
-        <p>Trajet quotidien à partir de votre point habituel, ou trajet ponctuel avec date et point de départ via la carte.</p>
-      </div>
-      <div class="col-md-4 text-center">
-        <img src="{% static 'img/icon-match.svg' %}" alt="Matching" width="60" class="mb-3">
-        <h5>Matching intelligent</h5>
-        <p>Notre algorithme trouve les conducteurs/passagers proches en distance et horaire, notifications instantanées.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Section Avantages -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <h2 class="mb-4 text-center">Pourquoi utiliser Ride4UAC ?</h2>
-    <div class="row gy-4">
-      <div class="col-md-6">
-        <ul class="list-unstyled">
-          <li class="mb-3">
-            <h6><i class="bi bi-clock-history me-2"></i>Gagner du temps</h6>
-            <p>Profitez du covoiturage pour optimiser vos trajets quotidiens ou ponctuels.</p>
-          </li>
-          <li class="mb-3">
-            <h6><i class="bi bi-geo-alt me-2"></i>Flexibilité</h6>
-            <p>Choisissez entre trajet récurrent ou ponctuel, et sélectionnez précisément votre point de départ.</p>
-          </li>
-          <li class="mb-3">
-            <h6><i class="bi bi-people me-2"></i>Communauté IFRI UAC</h6>
-            <p>Rencontrez d’autres étudiants et membres de la communauté pour partager des trajets.</p>
-          </li>
-          <li class="mb-3">
-            <h6><i class="bi bi-chat-dots me-2"></i>Messagerie intégrée</h6>
-            <p>Échangez directement avec votre co-voitureur une fois le match accepté.</p>
-          </li>
-        </ul>
-      </div>
-      <div class="col-md-6">
-        <img src="{% static 'img/home-illustration.png' %}" alt="Illustration covoiturage" class="img-fluid rounded">
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Section Témoignages / Avis (optionnel) -->
-<section class="py-5">
-  <div class="container">
-    <h2 class="mb-4 text-center">Témoignages</h2>
-    <div class="row gx-4 gy-4">
-      <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <p class="card-text">“Grâce à Ride4UAC, je fais des économies et j’ai noué des amitiés en chemin !”</p>
-            <h6 class="card-subtitle text-muted">– Étudiant IFRI</h6>
+      <div class="col py-3">
+        <h1 class="text-center justify-content-center fs-1 fw-normal">Bienvenue sur <span class="col-g fw-bolder">Ride 4UAC</span></h1>
+        <p class=" text-center">Partagez vos trajets vers l’IFRI UAC facilement : conducteurs et passagers se rencontrent ici.</p>
+        {% if user.is_authenticated %}
+          <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'trajet:dashboard' %}" class="btn bg-g btn-lg col-wh">Mon Dashboard</a>
+            <a href="{% url 'trajet:dashboard' %}?action=publish" class="btn col-wh bg-g btn-lg">Publier un trajet</a>
           </div>
+        {% else %}
+          <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'login' %}" class="btn bg-g btn-lg">Se connecter</a>
+            <a href="{% url 'signup' %}" class="btn btn-outline bg-g btn-lg">S’inscrire</a>
+          </div>
+        {% endif %}
+      </div>
+  </section>
+
+  <!-- Section Fonctionnalités -->
+  <section class="py-5">
+    <div class="container">
+      <h2 class="mb-5 text-center mt-5">Comment ça marche ?</h2>
+      <div class="row gy-4 mt-5">
+        <div class="col-md-4 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="8em" height="8em" viewBox="0 0 48 48"><g fill="#4DD5DC"><path d="M32 20a8 8 0 1 1-16 0a8 8 0 0 1 16 0"/><path fill-rule="evenodd" d="M23.184 43.984C12.517 43.556 4 34.772 4 24C4 12.954 12.954 4 24 4s20 8.954 20 20s-8.954 20-20 20h-.274q-.272 0-.542-.016M11.166 36.62a3.028 3.028 0 0 1 2.523-4.005c7.796-.863 12.874-.785 20.632.018a2.99 2.99 0 0 1 2.498 4.002A17.94 17.94 0 0 0 42 24c0-9.941-8.059-18-18-18S6 14.059 6 24c0 4.916 1.971 9.373 5.166 12.621" clip-rule="evenodd"/></g></svg>
+          <h5>Créez votre profil</h5>
+          <p>Indiquez si vous êtes conducteur ou passager, et renseignez vos coordonnées habituelles.</p>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <p class="card-text">“Le matching quotidien est très fiable, je ne rate jamais mon premier cours.”</p>
-            <h6 class="card-subtitle text-muted">– Conducteur régulier</h6>
-          </div>
+        <div class="col-md-4 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="8em" height="8em" viewBox="0 0 24 24"><circle cx="9" cy="9" r="2.5" fill="#4dd5dc" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="1.615s" dur="0.285s" values="0;1"/></circle><g fill="none" stroke="#4dd5dc" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"><path fill="#4dd5dc" fill-opacity="0" stroke-dasharray="48" stroke-dashoffset="48" d="M9 20.5c0 0 -6 -7 -6 -11.5c0 -3.31 2.69 -6 6 -6c3.31 0 6 2.69 6 6c0 4.5 -6 11.5 -6 11.5Z"><animate fill="freeze" attributeName="fill-opacity" begin="1.33s" dur="0.285s" values="0;0.1"/><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.14s" values="48;0"/></path><path stroke-dasharray="8" stroke-dashoffset="8" d="M16 18h6"><animate fill="freeze" attributeName="stroke-dashoffset" begin="1.9s" dur="0.38s" values="8;0"/></path></g></svg>
+          <h5>Publiez un trajet</h5>
+          <p>Trajet quotidien à partir de votre point habituel, ou trajet ponctuel avec date et point de départ via la carte.</p>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <p class="card-text">“Interface simple, j’aime la sélection du point via la carte pour mes trajets ponctuels.”</p>
-            <h6 class="card-subtitle text-muted">– Passager occasionnel</h6>
-          </div>
+        <div class="col-md-4 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="8em" height="8em" viewBox="0 0 20 20"><g fill="none"><path fill="url(#fluentColorPeople200)" d="M10.5 12.5c0-.828.682-1.5 1.524-1.5h4.952c.842 0 1.524.672 1.524 1.5c0 0 0 3-4 3s-4-3-4-3"/><path fill="url(#fluentColorPeople205)" fill-opacity="0.5" d="M10.5 12.5c0-.828.682-1.5 1.524-1.5h4.952c.842 0 1.524.672 1.524 1.5c0 0 0 3-4 3s-4-3-4-3"/><path fill="url(#fluentColorPeople201)" d="M1.5 13a2 2 0 0 1 2-2H10a2 2 0 0 1 2 2s0 4-5.25 4s-5.25-4-5.25-4"/><path fill="url(#fluentColorPeople202)" d="M1.5 13a2 2 0 0 1 2-2H10a2 2 0 0 1 2 2s0 4-5.25 4s-5.25-4-5.25-4"/><path fill="url(#fluentColorPeople203)" d="M14.5 10a2.5 2.5 0 1 0 0-5a2.5 2.5 0 0 0 0 5"/><path fill="url(#fluentColorPeople204)" d="M6.75 10a3.25 3.25 0 1 0 0-6.5a3.25 3.25 0 0 0 0 6.5"/><defs><linearGradient id="fluentColorPeople200" x1="12.402" x2="14" y1="11.598" y2="16.134" gradientUnits="userSpaceOnUse"><stop offset=".125" stop-color="#4dd5dc"/><stop offset="1" stop-color="#4dd5dc"/></linearGradient><linearGradient id="fluentColorPeople201" x1="3.997" x2="6.153" y1="11.798" y2="17.823" gradientUnits="userSpaceOnUse"><stop offset=".125" stop-color="#4dd5dc"/><stop offset="1" stop-color="#4dd5dc"/></linearGradient><linearGradient id="fluentColorPeople202" x1="6.75" x2="9.79" y1="10.286" y2="20.225" gradientUnits="userSpaceOnUse"><stop stop-color="#885edb" stop-opacity="0"/><stop offset="1" stop-color="#5a5a5a"/></linearGradient><linearGradient id="fluentColorPeople203" x1="13.189" x2="15.737" y1="5.665" y2="9.734" gradientUnits="userSpaceOnUse"><stop offset=".125" stop-color="#4dd5dc"/><stop offset="1" stop-color="#4dd5dc"/></linearGradient><linearGradient id="fluentColorPeople204" x1="5.046" x2="8.358" y1="4.364" y2="9.654" gradientUnits="userSpaceOnUse"><stop offset=".125" stop-color="#4dd5dc"/><stop offset="1" stop-color="#4dd5dc"/></linearGradient><radialGradient id="fluentColorPeople205" cx="0" cy="0" r="1" gradientTransform="rotate(-7.105 111.453 -69.765)scale(5.30556)" gradientUnits="userSpaceOnUse"><stop offset=".392" stop-color="#3b148a"/><stop offset="1" stop-color="#3b148a" stop-opacity="0"/></radialGradient></defs></g></svg>
+          <h5>Matching intelligent</h5>
+          <p>Notre algorithme trouve les conducteurs/passagers proches en distance et horaire, notifications instantanées.</p>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Section Appel à l’action final -->
-<section class="py-5 bg-primary text-white text-center">
-  <div class="container">
-    <h2>Prêt à partager votre prochain trajet ?</h2>
-    {% if user.is_authenticated %}
-      <a href="{% url 'trajet:dashboard' %}" class="btn btn-light btn-lg mt-3">Mon Dashboard</a>
-    {% else %}
-      <a href="{% url 'signup' %}" class="btn btn-light btn-lg mt-3">Créer un compte</a>
-    {% endif %}
-  </div>
-</section>
+  <!-- Section Avantages -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <h2 class="mb-4 text-center">Pourquoi utiliser Ride4UAC ?</h2>
+      <div class="row gy-4">
+        <div class="col-md-6">
+          <ul class="list-unstyled">
+            <li class="mb-3">
+              <h4><i class="bi bi-clock-history me-2" style="color:#4DD5DC;opacity: 1;"></i>Gagner du temps</h4>
+              <p>Profitez du covoiturage pour optimiser vos trajets quotidiens ou ponctuels.</p>
+            </li>
+            <li class="mb-3">
+              <h4><i class="bi bi-geo-alt me-2" style="color:#4DD5DC;opacity: 1;"></i>Flexibilité</h4>
+              <p>Choisissez entre trajet récurrent ou ponctuel, et sélectionnez précisément votre point de départ.</p>
+            </li>
+            <li class="mb-3">
+              <h4><i class="bi bi-people me-2" style="color:#4DD5DC;opacity: 1;"></i>Communauté IFRI UAC</h4>
+              <p>Rencontrez d’autres étudiants et membres de la communauté pour partager des trajets.</p>
+            </li>
+            <li class="mb-3">
+              <h4><i class="bi bi-chat-dots me-2" style="color:#4DD5DC;opacity: 1;"></i>Messagerie intégrée</h4>
+              <p>Échangez directement avec votre co-voitureur une fois le match accepté.</p>
+            </li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <img src="{% static 'img/home-illustration.png' %}" alt="Illustration covoiturage" class="img-fluid rounded">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Témoignages / Avis (optionnel) -->
+  <section class="py-5">
+    <div class="container">
+      <h2 class="mb-4 text-center">Témoignages</h2>
+      <div class="row gx-4 gy-4">
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <p class="card-text">“Grâce à Ride4UAC, je fais des économies et j’ai noué des amitiés en chemin !”</p>
+              <h6 class="card-subtitle text-muted">– Étudiant IFRI</h6>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <p class="card-text">“Le matching quotidien est très fiable, je ne rate jamais mon premier cours.”</p>
+              <h6 class="card-subtitle text-muted">– Conducteur régulier</h6>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <p class="card-text">“Interface simple, j’aime la sélection du point via la carte pour mes trajets ponctuels.”</p>
+              <h6 class="card-subtitle text-muted">– Passager occasionnel</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Appel à l’action final -->
+  <section class="py-5 bg-primary text-white text-center">
+    <div class="container">
+      <h2>Prêt à partager votre prochain trajet ?</h2>
+      {% if user.is_authenticated %}
+        <a href="{% url 'trajet:dashboard' %}" class="btn btn-light btn-lg mt-3">Mon Dashboard</a>
+      {% else %}
+        <a href="{% url 'signup' %}" class="btn btn-light btn-lg mt-3">Créer un compte</a>
+      {% endif %}
+    </div>
+  </section>
+</div>
 {% endblock %}

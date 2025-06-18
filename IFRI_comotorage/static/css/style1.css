@@ -23,6 +23,7 @@ nav {
     justify-content: space-between;
     align-items: center;
     top: 0;
+    width: 100%;
 
 }
 .bar img{
@@ -55,6 +56,21 @@ nav {
 }
 .chrono p{
     display: inline;
+}
+.required-star {
+        color: red;
+        font-size: 1em;
+        margin-right: 2px;
+    }
+.user-block{
+    display: flex;
+    background: #fff !important;
+    border-radius: 1em;
+    padding: 0 1em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    margin: 0;
+}
+.user-block span{
 }
 .logo{
     
@@ -113,7 +129,7 @@ nav {
 .menu-container{
     display: flex;
     flex-direction: row;
-    margin-block: auto;
+    padding: 0;
     
 }
 .menu-list{
@@ -121,6 +137,7 @@ nav {
     flex-direction: row;
     align-items: center;
     list-style-type: none;
+    margin-block: auto;padding: 0;
 }
 .menu-list li{
     display: inline-block;
@@ -184,7 +201,7 @@ fieldset {
             .mobil{display: none;}
     }
 @media screen and (max-width: 768px) {
-       .container-md{width: 100%;margin-inline: 0;}
+       nav{width: 100%;margin-inline: 0;}
        .bare{display: none;}
     }
 .map-container{z-index: 10; position: relative;}

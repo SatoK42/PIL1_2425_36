@@ -4,12 +4,19 @@
 {% block title %}Réinitialisation du mot de passe{% endblock %}
 
 {% block content %}
-<h2>Réinitialisation du mot de passe</h2>
-<form method="POST">
-    {% csrf_token %}
-    <label>Email ou numéro de téléphone :</label><br>
-    <input type="text" name="identifiant" required><br><br>
-    <button type="submit">Continuer</button>
-</form>
-<p style="color:red;">{{ message }}</p>
+<h2 class="text-center">Réinitialisation du mot de passe</h2>
+<br>
+<br>
+<div class="form row mb-5">
+    <form method="POST">
+        {% csrf_token %}
+        <p class="text-center op-5 fs-4">Veuillez entrer votre adresse e-mail ou votre numéro de téléphone pour réinitialiser votre mot de passe.</p>
+        <label for="identifiant" class="required-star">*</label><br>
+        <input class="form-control" type="text" id="identifiant" name="identifiant" placeholder="Email ou numéro de téléphone" required><br><br>
+        {% if message %}
+            <div class="alert alert-danger p-2">{{ message }}</div>
+        {% endif %}
+        <button type="submit" class="btn bg-g col-wh">Continuer</button>
+    </form>
+</div>
 {% endblock %}

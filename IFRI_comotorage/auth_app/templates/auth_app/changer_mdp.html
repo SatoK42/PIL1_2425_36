@@ -2,14 +2,32 @@
 {% block title %}Changer le mot de passe{% endblock %}
 
 {% block content %}
-<h2>Changer le mot de passe</h2>
-<form method="POST">
-    {% csrf_token %}
-    <label>Nouveau mot de passe :</label><br>
-    <input type="password" name="mdp1" required><br><br>
-    <label>Confirmer le mot de passe :</label><br>
-    <input type="password" name="mdp2" required><br><br>
-    <button type="submit">Valider</button>
-</form>
-<p style="color:red;">{{ message }}</p>
+<h2 class="text-center">Changer le mot de passe</h2>
+<br>
+<div class="form row mb-5">
+    <form method="POST">
+        {% csrf_token %}
+        <span class="required-star">*</span><label for="mdp1">Nouveau mot de passe :</label><br>
+        <input class="form-control" type="password" name="mdp1" id="mdp1" placeholder="Entrez votre nouveau mot de passe" required><br><br>
+        {% if form.mdp1.errors %}
+            <div class="text-danger">
+                {{ form.mdp1.errors|striptags }}
+            </div>
+        {% endif %}
+        <span class="required-star">*</span><label for="mdp2">Confirmer le mot de passe :</label><br>
+        <input class="form-control" type="password" name="mdp2" id="mdp2" placeholder="Confirmez votre nouveau mot de passe" required><br><br>
+        {% if form.mdp2.errors %}
+            <div class="text-danger">
+                {{ form.mdp2.errors|striptags }}
+            </div>
+        {% endif %}
+        {% if message %}
+            <div class="alert alert-danger p-2">{{ message }}</div>
+        {% endif %}
+        {% if success %}
+            <div class="alert alert-success p-2">{{ success }}</div>
+        {% endif %}
+        <button type="submit" class="btn bg-g col-wh">Valider</button>
+    </form>
+</div>
 {%endblock%}
