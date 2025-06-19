@@ -54,7 +54,8 @@ python manage.py runserver
 ### 7. Lancer le serveur ASGI (pour WebSocket/Channels)
 
 ```
-python -m daphne IFRI_comotorage.IFRI_comotorage.asgi:application
+cd IFRI_comotorage
+python -m daphne -b 0.0.0.0 -p 8000 IFRI_comotorage.asgi:application
 ```
 
 ## Structure du projet
