@@ -40,6 +40,7 @@ pip install -r requirements.txt
 - Une fois la base créée, poursuivez avec les étapes suivantes :
 
 ```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
 

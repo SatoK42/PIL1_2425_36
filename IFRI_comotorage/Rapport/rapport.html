@@ -467,8 +467,7 @@
               <li>Créer la base de données <code>django</code> dans MySQL</li>
               <li>Configurer les paramètres de base de données dans <code>settings.py</code></li>
               <li>Appliquer les migrations : <code>python manage.py migrate</code></li>
-              <li>Créer un superutilisateur : <code>python manage.py createsuperuser</code></li>
-              <li>Lancer le serveur de développement : <code>python manage.py runserver</code></li>
+              <li>Lancer Daphne pour démarrer le serveur ASGI : <code>daphne -b 0.0.0.0 -p 8000 IFRI_comotorage.asgi:application</code></li>
             </ol>
           </div>
         </div>
